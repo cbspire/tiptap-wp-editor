@@ -883,28 +883,28 @@ WordPress 7.0 or higher.
 
 Build in this sequence — validate each layer before building on top of it:
 
-1. **Content converter test suite** — build fixtures first, before writing any
-   conversion code. Tests drive the implementation.
-1. **`class-version-compat.php`** — the feature flag foundation. Write tests
-   for it immediately. Every other class depends on this being correct.
-1. **`class-content-converter.php`** + **`src/editor/extensions/shortcode.ts`**
-   — the safety-critical path. Get conversion right before touching WP integration.
-1. **TipTap editor core** (`src/editor/index.ts` + StarterKit + WP extensions)
-   — build and test in isolation (plain HTML page, no WP) first.
-1. **`class-editor-registration.php`** — hook TipTap into WP post editor.
-   Test Gutenberg coexistence immediately. Test on both WP 6.8 and WP 7.0.
-1. **`class-assets.php`** — proper enqueueing, version-aware CSS tier selection,
-   externalised `@wordpress/*` deps.
-1. **Legacy settings page** (`class-admin-ui-legacy.php` + `settings-legacy.tsx`)
-   — get the full settings flow working on 6.8 first.
-1. **Modern settings page** (`class-admin-ui-modern.php` + `settings-modern.tsx`)
-   — layer DataViews UI on top once legacy is proven.
-1. **AI features** (`class-abilities.php` + `AIMenu.tsx`) — register abilities,
-   build the bubble menu, test with a real WP 7.0 AI connection. Verify
-   complete absence on WP 6.8/6.9.
-1. **`class-meta-box.php`** — field mode, `tiptap_field()` API.
-1. **Tests** — fill in unit and JS tests alongside each step.
-1. **`readme.txt`** + **`uninstall.php`** + **WP.org assets** — launch prep.
+- [x] **Content converter test suite** — build fixtures first, before writing any
+  conversion code. Tests drive the implementation.
+- [x] **`class-version-compat.php`** — the feature flag foundation. Write tests
+  for it immediately. Every other class depends on this being correct.
+- [ ] **`class-content-converter.php`** + **`src/editor/extensions/shortcode.ts`**
+  — the safety-critical path. Get conversion right before touching WP integration.
+- [ ] **TipTap editor core** (`src/editor/index.ts` + StarterKit + WP extensions)
+  — build and test in isolation (plain HTML page, no WP) first.
+- [ ] **`class-editor-registration.php`** — hook TipTap into WP post editor.
+  Test Gutenberg coexistence immediately. Test on both WP 6.8 and WP 7.0.
+- [ ] **`class-assets.php`** — proper enqueueing, version-aware CSS tier selection,
+  externalised `@wordpress/*` deps.
+- [ ] **Legacy settings page** (`class-admin-ui-legacy.php` + `settings-legacy.tsx`)
+  — get the full settings flow working on 6.8 first.
+- [ ] **Modern settings page** (`class-admin-ui-modern.php` + `settings-modern.tsx`)
+  — layer DataViews UI on top once legacy is proven.
+- [ ] **AI features** (`class-abilities.php` + `AIMenu.tsx`) — register abilities,
+  build the bubble menu, test with a real WP 7.0 AI connection. Verify
+  complete absence on WP 6.8/6.9.
+- [ ] **`class-meta-box.php`** — field mode, `tiptap_field()` API.
+- [ ] **Tests** — fill in unit and JS tests alongside each step.
+- [ ] **`readme.txt`** + **`uninstall.php`** + **WP.org assets** — launch prep.
 
 -----
 
