@@ -1,0 +1,118 @@
+/**
+ * TipTap Editor — Legacy CSS (WP 6.8 / 6.9)
+ *
+ * Self-contained styles for the editor toolbar and UI elements on WP 6.8/6.9.
+ * Does NOT depend on any WP 7.0 design tokens.
+ * Must look clean and consistent on WP 6.x admin themes.
+ *
+ * Loaded instead of editor-modern.css on WP 6.8/6.9.
+ * Loaded alongside editor.css (base).
+ */
+
+/* =========================================================================
+   Color palette (self-contained, no tokens)
+   ========================================================================= */
+
+:root {
+	--tiptap-bg: #f6f7f7;
+	--tiptap-border: #c3c4c7;
+	--tiptap-text: #1d2327;
+	--tiptap-text-muted: #646970;
+	--tiptap-primary: #2271b1;
+	--tiptap-primary-hover: #135e96;
+	--tiptap-active-bg: #e8f0fb;
+	--tiptap-active-border: #2271b1;
+	--tiptap-chip-bg: #e5eff8;
+	--tiptap-chip-text: #2271b1;
+	--tiptap-html-chip-bg: #fcf0e0;
+	--tiptap-html-chip-text: #7a4100;
+	--tiptap-html-chip-icon-bg: #f0b849;
+}
+
+/* =========================================================================
+   Editor container
+   ========================================================================= */
+
+#tiptap-editor-root {
+	border: 1px solid var(--tiptap-border);
+	border-radius: 4px;
+	background: #fff;
+	color: var(--tiptap-text);
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+	font-size: 14px;
+}
+
+.ProseMirror {
+	color: var(--tiptap-text);
+}
+
+.ProseMirror:focus {
+	box-shadow: 0 0 0 2px var(--tiptap-primary);
+}
+
+/* =========================================================================
+   Toolbar
+   ========================================================================= */
+
+.tiptap-toolbar {
+	background: var(--tiptap-bg);
+	border-bottom: 1px solid var(--tiptap-border);
+	border-radius: 4px 4px 0 0;
+}
+
+.tiptap-toolbar__button {
+	color: var(--tiptap-text);
+}
+
+.tiptap-toolbar__button:hover {
+	background: var(--tiptap-active-bg);
+	border-color: var(--tiptap-active-border);
+	color: var(--tiptap-primary);
+}
+
+.tiptap-toolbar__button.is-active {
+	background: var(--tiptap-active-bg);
+	border-color: var(--tiptap-active-border);
+	color: var(--tiptap-primary);
+}
+
+/* =========================================================================
+   Shortcode chip
+   ========================================================================= */
+
+.tiptap-shortcode-chip {
+	background: var(--tiptap-chip-bg);
+	color: var(--tiptap-chip-text);
+	border: 1px solid var(--tiptap-active-border);
+}
+
+.tiptap-shortcode-chip:hover {
+	filter: brightness(0.95);
+}
+
+/* =========================================================================
+   Read-more divider
+   ========================================================================= */
+
+.tiptap-read-more__line {
+	border-top-color: var(--tiptap-border);
+}
+
+.tiptap-read-more__label {
+	color: var(--tiptap-text-muted);
+}
+
+/* =========================================================================
+   Raw HTML chip
+   ========================================================================= */
+
+.tiptap-raw-html-chip {
+	background: var(--tiptap-html-chip-bg);
+	color: var(--tiptap-html-chip-text);
+	border: 1px solid #e8b44e;
+}
+
+.tiptap-raw-html-chip__icon {
+	background: var(--tiptap-html-chip-icon-bg);
+	color: var(--tiptap-html-chip-text);
+}

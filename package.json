@@ -1,0 +1,37 @@
+{
+  "name": "tiptap-editor",
+  "version": "0.1.0",
+  "description": "A modern rich text editor for WordPress built on TipTap/ProseMirror",
+  "private": true,
+  "scripts": {
+    "build": "wp-scripts build",
+    "start": "wp-scripts start",
+    "lint:js": "wp-scripts lint-js",
+    "lint:css": "wp-scripts lint-style",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@tiptap/core": "^2.10.4",
+    "@tiptap/starter-kit": "^2.10.4",
+    "@tiptap/extension-image": "^2.10.4",
+    "@tiptap/extension-link": "^2.10.4",
+    "@tiptap/extension-underline": "^2.10.4",
+    "@tiptap/react": "^2.10.4",
+    "@wordpress/scripts": "^30.0.0",
+    "@wordpress/components": "^29.0.0",
+    "@wordpress/element": "^6.16.0",
+    "@wordpress/icons": "^10.16.0",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
+  },
+  "main": "assets/js/editor.js",
+  "files": [
+    "assets/",
+    "includes/",
+    "languages/",
+    "tiptap-editor.php",
+    "uninstall.php",
+    "readme.txt"
+  ]
+}

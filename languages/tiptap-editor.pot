@@ -1,0 +1,137 @@
+# Copyright (C) 2026 cbspire
+# This file is distributed under the same license as the TipTap Editor plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: TipTap Editor 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/cbspire/tiptap-wp-editor/issues\n"
+"POT-Creation-Date: 2026-04-09T00:00:00+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2026-04-09T00:00:00+00:00\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"X-Generator: WP-CLI 2.x\n"
+"X-Domain: tiptap-editor\n"
+
+#. Plugin Name of the plugin
+msgid "TipTap Editor"
+msgstr ""
+
+#. Description of the plugin
+msgid "A modern, focused rich text editor built on TipTap/ProseMirror. Replaces TinyMCE for opted-in post types. AI writing features on WP 7.0+."
+msgstr ""
+
+#: includes/class-admin-ui-legacy.php
+msgid "Post Types"
+msgstr ""
+
+#: includes/class-admin-ui-legacy.php
+msgid "Enable TipTap for:"
+msgstr ""
+
+#: includes/class-admin-ui-legacy.php
+msgid "(Block editor — TipTap not available)"
+msgstr ""
+
+#: includes/class-admin-ui-legacy.php
+msgid "Editor Options"
+msgstr ""
+
+#: includes/class-admin-ui-legacy.php
+msgid "Toolbar"
+msgstr ""
+
+#: includes/class-admin-ui-legacy.php
+msgid "Minimal (bold, italic, links only)"
+msgstr ""
+
+#: includes/class-admin-ui-legacy.php
+msgid "Standard (recommended)"
+msgstr ""
+
+#: includes/class-admin-ui-legacy.php
+msgid "Full (all formatting options)"
+msgstr ""
+
+#: includes/class-admin-ui-legacy.php
+msgid "Status"
+msgstr ""
+
+#: includes/class-admin-ui-legacy.php
+msgid "Select the post types where TipTap Editor should replace TinyMCE."
+msgstr ""
+
+#: includes/class-admin-ui-legacy.php
+msgid "WordPress version"
+msgstr ""
+
+#: includes/class-admin-ui-legacy.php
+msgid "PHP version"
+msgstr ""
+
+#: includes/class-admin-ui-legacy.php
+msgid "AI writing features"
+msgstr ""
+
+#: includes/class-admin-ui-legacy.php
+msgid "Available"
+msgstr ""
+
+#: includes/class-admin-ui-legacy.php
+msgid "Upgrade to WordPress 7.0 to unlock AI writing assistance."
+msgstr ""
+
+#: includes/class-abilities.php
+msgid "Improve Writing"
+msgstr ""
+
+#: includes/class-abilities.php
+msgid "Rewrite selected text to improve clarity and flow."
+msgstr ""
+
+#: includes/class-abilities.php
+msgid "Summarise"
+msgstr ""
+
+#: includes/class-abilities.php
+msgid "Summarise the selected text into a shorter version."
+msgstr ""
+
+#: includes/class-abilities.php
+msgid "Expand"
+msgstr ""
+
+#: includes/class-abilities.php
+msgid "Expand the selected text with more detail."
+msgstr ""
+
+#: includes/class-abilities.php
+msgid "Change Tone"
+msgstr ""
+
+#: includes/class-abilities.php
+msgid "Rewrite the selected text in a different tone."
+msgstr ""
+
+#: includes/class-abilities.php
+msgid "Generate Alt Text"
+msgstr ""
+
+#: includes/class-abilities.php
+msgid "Generate descriptive alt text for an image."
+msgstr ""
+
+#: includes/class-abilities.php
+msgid "The Abilities API is not available on this WordPress installation."
+msgstr ""
+
+#: includes/class-abilities.php
+msgid "WP AI Client not available."
+msgstr ""
+
+#: includes/class-abilities.php
+msgid "Attachment not found."
+msgstr ""
