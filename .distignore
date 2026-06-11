@@ -1,0 +1,21 @@
+# Files excluded from the WP.org SVN deploy.
+# The compiled assets/ directory IS included.
+# Source files, dev tooling, and tests are excluded.
+
+src/
+node_modules/
+package.json
+package-lock.json
+tsconfig.json
+webpack.config.js
+phpcs.xml.dist
+phpstan.neon
+phpunit.xml.dist
+composer.json
+composer.lock
+bin/
+tests/
+.git/
+.gitignore
+.distignore
+*.map

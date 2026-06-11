@@ -1,0 +1,236 @@
+/**
+ * TipTap Editor — Base Styles
+ *
+ * Shared foundational styles loaded on all WP versions.
+ * Does not use design tokens. Used as the base for both
+ * editor-legacy.css and editor-modern.css.
+ *
+ * BEM naming: .tiptap- prefix on all classes.
+ */
+
+/* =========================================================================
+   Editor container
+   ========================================================================= */
+
+.ProseMirror {
+	min-height: 300px;
+	padding: 12px 16px;
+	outline: none;
+	line-height: 1.6;
+}
+
+.ProseMirror p {
+	margin-top: 0;
+	margin-bottom: 1em;
+}
+
+.ProseMirror p:last-child {
+	margin-bottom: 0;
+}
+
+/* =========================================================================
+   Toolbar base
+   ========================================================================= */
+
+.tiptap-toolbar {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 2px;
+	padding: 4px;
+	border-bottom: 1px solid currentColor;
+	align-items: center;
+}
+
+.tiptap-toolbar__button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 28px;
+	height: 28px;
+	padding: 0 6px;
+	border: 1px solid transparent;
+	border-radius: 2px;
+	background: transparent;
+	cursor: pointer;
+	font-size: 13px;
+	line-height: 1;
+	transition: background 0.1s ease, border-color 0.1s ease;
+}
+
+.tiptap-toolbar__button:hover {
+	border-color: currentColor;
+}
+
+.tiptap-toolbar__button.is-active {
+	font-weight: bold;
+}
+
+.tiptap-toolbar__button:disabled {
+	opacity: 0.4;
+	cursor: not-allowed;
+}
+
+/* =========================================================================
+   Shortcode chip
+   ========================================================================= */
+
+.tiptap-shortcode-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 2px 8px;
+	border-radius: 12px;
+	font-size: 12px;
+	font-family: monospace;
+	cursor: pointer;
+	user-select: none;
+	vertical-align: middle;
+}
+
+.tiptap-shortcode-chip__label {
+	pointer-events: none;
+}
+
+/* =========================================================================
+   Read-more divider
+   ========================================================================= */
+
+.tiptap-read-more {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin: 16px 0;
+	user-select: none;
+}
+
+.tiptap-read-more__line {
+	flex: 1;
+	border: none;
+	border-top: 1px dashed currentColor;
+	opacity: 0.5;
+}
+
+.tiptap-read-more__label {
+	font-size: 12px;
+	font-style: italic;
+	opacity: 0.7;
+	white-space: nowrap;
+}
+
+/* =========================================================================
+   Raw HTML chip
+   ========================================================================= */
+
+.tiptap-raw-html-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 10px;
+	border-radius: 4px;
+	font-size: 12px;
+	cursor: pointer;
+	user-select: none;
+	font-family: monospace;
+}
+
+.tiptap-raw-html-chip__icon {
+	font-weight: bold;
+	font-size: 10px;
+	padding: 1px 4px;
+	border-radius: 2px;
+}
+
+.tiptap-raw-html-chip__preview {
+	opacity: 0.7;
+	max-width: 200px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* =========================================================================
+   Shortcode popover
+   ========================================================================= */
+
+.tiptap-shortcode-popover {
+	display: flex;
+	gap: 6px;
+	align-items: center;
+	padding: 8px;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.tiptap-shortcode-popover__input {
+	flex: 1;
+	min-width: 240px;
+	padding: 4px 8px;
+	border: 1px solid #8c8f94;
+	border-radius: 2px;
+	font-family: monospace;
+	font-size: 13px;
+}
+
+/* =========================================================================
+   AI menu
+   ========================================================================= */
+
+.tiptap-ai-menu {
+	position: relative;
+	display: inline-block;
+}
+
+.tiptap-ai-menu__dropdown {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	z-index: 100;
+	min-width: 180px;
+	margin: 2px 0 0;
+	padding: 4px 0;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	list-style: none;
+}
+
+.tiptap-ai-menu__dropdown li {
+	position: relative;
+}
+
+.tiptap-ai-menu__dropdown button {
+	display: block;
+	width: 100%;
+	padding: 6px 14px;
+	background: transparent;
+	border: none;
+	text-align: left;
+	cursor: pointer;
+	font-size: 13px;
+}
+
+.tiptap-ai-menu__dropdown button:hover {
+	background: #f0f0f1;
+}
+
+.tiptap-ai-menu__submenu {
+	position: absolute;
+	top: 0;
+	left: 100%;
+	min-width: 160px;
+	margin: 0;
+	padding: 4px 0;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	list-style: none;
+}
+
+.tiptap-ai-menu__error {
+	margin: 4px 0;
+	font-size: 12px;
+}

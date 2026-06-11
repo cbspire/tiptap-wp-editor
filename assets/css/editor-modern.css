@@ -1,0 +1,134 @@
+/**
+ * TipTap Editor — Modern CSS (WP 7.0+)
+ *
+ * Design token-aware styles for WP 7.0+.
+ * Every var() includes a fallback value for safety.
+ *
+ * Loaded instead of editor-legacy.css on WP 7.0+.
+ * Loaded alongside editor.css (base).
+ *
+ * Token reference:
+ *   --wp-admin-theme-color            Primary admin colour
+ *   --wp-admin-theme-color-darker-10  Darker variant
+ *   --wp--color--foreground           Foreground text colour
+ *   --wp--font-family                 Admin font family
+ *   --wp--border-radius               Standard border radius
+ */
+
+/* =========================================================================
+   Editor container
+   ========================================================================= */
+
+#tiptap-editor-root {
+	border: 1px solid var(--wp--color--border, #c3c4c7);
+	border-radius: var(--wp--border-radius, 4px);
+	background: var(--wp--color--background, #fff);
+	color: var(--wp--color--foreground, #1e1e1e);
+	font-family: var(--wp--font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+	font-size: var(--wp--font-size--small, 14px);
+}
+
+.ProseMirror {
+	color: var(--wp--color--foreground, #1e1e1e);
+}
+
+.ProseMirror:focus {
+	box-shadow: 0 0 0 2px var(--wp-admin-theme-color, #3858e9);
+}
+
+/* =========================================================================
+   Toolbar
+   ========================================================================= */
+
+.tiptap-toolbar {
+	background: var(--wp--color--background-secondary, #f6f7f7);
+	border-bottom: 1px solid var(--wp--color--border, #c3c4c7);
+	border-radius: var(--wp--border-radius, 4px) var(--wp--border-radius, 4px) 0 0;
+	font-family: var(--wp--font-family, -apple-system, sans-serif);
+}
+
+.tiptap-toolbar__button {
+	color: var(--wp--color--foreground, #1d2327);
+	border-radius: var(--wp--border-radius, 2px);
+}
+
+.tiptap-toolbar__button:hover {
+	background: var(--wp-admin-theme-color-lighter-20, #e8f0fb);
+	border-color: var(--wp-admin-theme-color, #3858e9);
+	color: var(--wp-admin-theme-color, #3858e9);
+}
+
+.tiptap-toolbar__button.is-active {
+	background: var(--wp-admin-theme-color-lighter-20, #e8f0fb);
+	border-color: var(--wp-admin-theme-color, #3858e9);
+	color: var(--wp-admin-theme-color, #3858e9);
+}
+
+/* =========================================================================
+   Shortcode chip
+   ========================================================================= */
+
+.tiptap-shortcode-chip {
+	background: var(--wp-admin-theme-color-lighter-20, #e8f0fb);
+	color: var(--wp-admin-theme-color, #3858e9);
+	border: 1px solid var(--wp-admin-theme-color, #3858e9);
+	border-radius: var(--wp--border-radius, 12px);
+}
+
+/* =========================================================================
+   Read-more divider
+   ========================================================================= */
+
+.tiptap-read-more__line {
+	border-top-color: var(--wp--color--border, #c3c4c7);
+}
+
+.tiptap-read-more__label {
+	color: var(--wp--color--foreground-secondary, #646970);
+}
+
+/* =========================================================================
+   Raw HTML chip
+   ========================================================================= */
+
+.tiptap-raw-html-chip {
+	background: var(--wp--color--warning-background, #fcf0e0);
+	color: var(--wp--color--warning-foreground, #7a4100);
+	border: 1px solid var(--wp--color--warning, #e8b44e);
+	border-radius: var(--wp--border-radius, 4px);
+}
+
+.tiptap-raw-html-chip__icon {
+	background: var(--wp--color--warning, #f0b849);
+	color: var(--wp--color--warning-foreground, #7a4100);
+	border-radius: var(--wp--border-radius, 2px);
+}
+
+/* =========================================================================
+   AI menu — design token aware
+   ========================================================================= */
+
+.tiptap-ai-menu__trigger {
+	background: var(--wp-admin-theme-color, #3858e9);
+	color: #fff;
+	border: none;
+	border-radius: var(--wp--border-radius, 4px);
+	padding: 0 10px;
+}
+
+.tiptap-ai-menu__trigger:hover {
+	background: var(--wp-admin-theme-color-darker-10, #2145c7);
+	border-color: transparent;
+	color: #fff;
+}
+
+.tiptap-ai-menu__dropdown {
+	background: var(--wp--color--background, #fff);
+	border-color: var(--wp--color--border, #c3c4c7);
+	border-radius: var(--wp--border-radius, 4px);
+}
+
+.tiptap-ai-menu__dropdown button:hover {
+	background: var(--wp-admin-theme-color-lighter-20, #e8f0fb);
+	color: var(--wp-admin-theme-color, #3858e9);
+}

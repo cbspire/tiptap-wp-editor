@@ -1,0 +1,9 @@
+parameters:
+  level: 6
+  paths:
+    - includes/
+  bootstrapFiles:
+    - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
+  ignoreErrors:
+    # wp_json_encode can return false but we handle it at call sites.
+    - '#Function wp_json_encode#'
