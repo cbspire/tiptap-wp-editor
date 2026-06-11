@@ -21,9 +21,12 @@ class Tiptap_Editor_Meta_Box {
 	/**
 	 * Registered field configurations.
 	 *
+	 * Static so that fields registered via tiptap_field() — possibly before
+	 * the plugin's hooked instance is constructed — are always visible to it.
+	 *
 	 * @var array<string, array<string, mixed>>
 	 */
-	private array $fields = [];
+	private static array $fields = [];
 
 	/**
 	 * Register WordPress hooks.
@@ -44,13 +47,13 @@ class Tiptap_Editor_Meta_Box {
 	 *   - toolbar     (string) — 'minimal' | 'standard' | 'full'. Defaults to 'standard'.
 	 *   - ai          (bool) — Show AI menu if Abilities API available. Defaults to false.
 	 */
-	public function add_field( array $args ): void {
+	public static function add_field( array $args ): void {
 		$id = sanitize_key( (string) ( $args['id'] ?? '' ) );
 		if ( empty( $id ) ) {
 			return;
 		}
 
-		$this->fields[ $id ] = wp_parse_args(
+		self::$fields[ $id ] = wp_parse_args(
 			$args,
 			[
 				'id'         => $id,
@@ -67,7 +70,7 @@ class Tiptap_Editor_Meta_Box {
 	 * Register meta boxes for all configured fields.
 	 */
 	public function register_meta_boxes(): void {
-		foreach ( $this->fields as $field ) {
+		foreach ( self::$fields as $field ) {
 			foreach ( (array) $field['post_types'] as $post_type ) {
 				add_meta_box(
 					'tiptap-field-' . $field['id'],
@@ -128,7 +131,7 @@ class Tiptap_Editor_Meta_Box {
 			return;
 		}
 
-		foreach ( $this->fields as $field ) {
+		foreach ( self::$fields as $field ) {
 			if ( ! in_array( $post->post_type, (array) $field['post_types'], true ) ) {
 				continue;
 			}
@@ -155,19 +158,4 @@ class Tiptap_Editor_Meta_Box {
 			}
 		}
 	}
-}
-
-/**
- * Public API: register a TipTap field.
- *
- * @param array<string, mixed> $args Field configuration (see Tiptap_Editor_Meta_Box::add_field).
- */
-function tiptap_field( array $args ): void {
-	static $instance = null;
-	if ( null === $instance ) {
-		// Get the instance registered by the plugin.
-		global $tiptap_meta_box_instance;
-		$instance = $tiptap_meta_box_instance ?? new Tiptap_Editor_Meta_Box();
-	}
-	$instance->add_field( $args );
 }

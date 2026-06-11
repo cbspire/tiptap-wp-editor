@@ -14,6 +14,8 @@ A modern, focused rich text editor built on TipTap/ProseMirror. Replaces TinyMCE
 
 TipTap Editor replaces TinyMCE with a modern, clean rich text editor for opted-in post types. It does not touch Gutenberg-enabled post types or conflict with the block editor.
 
+Want to try it first? [Launch a live demo in WordPress Playground](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/cbspire/tiptap-wp-editor/main/blueprint.json) — no installation required.
+
 **Key features:**
 
 * Post editor replacement for Classic Editor users and custom post types
@@ -48,7 +50,20 @@ Yes. TipTap saves HTML to `post_content` in the same format as TinyMCE. No conte
 
 The plugin itself is free. AI features on WP 7.0+ use whatever AI provider you connect via Settings > Connectors. Provider costs depend on your provider choice.
 
+= Does the plugin send my content to external services? =
+
+No. The plugin makes zero external API calls. AI requests go through WordPress core's Abilities API and AI Client, using the provider you configured in Settings > Connectors.
+
+= Why is wpautop disabled for TipTap post types? =
+
+TipTap saves HTML with correct paragraph tags already in place. Running wpautop on it would double the paragraphs, so the plugin disables wpautop — only for the post types where you explicitly enabled TipTap.
+
 == Changelog ==
 
 = 0.1.0 =
 * Initial release.
+
+== Upgrade Notice ==
+
+= 0.1.0 =
+Initial release.

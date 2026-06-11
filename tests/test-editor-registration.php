@@ -37,34 +37,34 @@ class Test_Editor_Registration extends WP_UnitTestCase {
 	}
 
 	/**
-	 * is_active_post_type() returns false for empty string.
+	 * is_post_type_active() returns false for empty string.
 	 */
 	public function test_empty_post_type_returns_false(): void {
-		$this->assertFalse( $this->registration->is_active_post_type( '' ) );
+		$this->assertFalse( Tiptap_Editor_Editor_Registration::is_post_type_active( '' ) );
 	}
 
 	/**
-	 * is_active_post_type() returns false when option is empty.
+	 * is_post_type_active() returns false when option is empty.
 	 */
 	public function test_returns_false_when_no_post_types_configured(): void {
 		delete_option( 'tiptap_editor_post_types' );
-		$this->assertFalse( $this->registration->is_active_post_type( 'post' ) );
+		$this->assertFalse( Tiptap_Editor_Editor_Registration::is_post_type_active( 'post' ) );
 	}
 
 	/**
-	 * is_active_post_type() returns true when post type is in option.
+	 * is_post_type_active() returns true when post type is in option.
 	 */
 	public function test_returns_true_for_configured_post_type(): void {
 		update_option( 'tiptap_editor_post_types', [ 'post' ] );
-		$this->assertTrue( $this->registration->is_active_post_type( 'post' ) );
+		$this->assertTrue( Tiptap_Editor_Editor_Registration::is_post_type_active( 'post' ) );
 	}
 
 	/**
-	 * is_active_post_type() returns false for post type not in option.
+	 * is_post_type_active() returns false for post type not in option.
 	 */
 	public function test_returns_false_for_unconfigured_post_type(): void {
 		update_option( 'tiptap_editor_post_types', [ 'page' ] );
-		$this->assertFalse( $this->registration->is_active_post_type( 'post' ) );
+		$this->assertFalse( Tiptap_Editor_Editor_Registration::is_post_type_active( 'post' ) );
 	}
 
 	/**
@@ -75,16 +75,16 @@ class Test_Editor_Registration extends WP_UnitTestCase {
 
 		add_filter( 'tiptap_editor_post_types', static fn() => [ 'article', 'news' ] );
 
-		$this->assertFalse( $this->registration->is_active_post_type( 'post' ) );
-		$this->assertTrue( $this->registration->is_active_post_type( 'article' ) );
-		$this->assertTrue( $this->registration->is_active_post_type( 'news' ) );
+		$this->assertFalse( Tiptap_Editor_Editor_Registration::is_post_type_active( 'post' ) );
+		$this->assertTrue( Tiptap_Editor_Editor_Registration::is_post_type_active( 'article' ) );
+		$this->assertTrue( Tiptap_Editor_Editor_Registration::is_post_type_active( 'news' ) );
 	}
 
 	/**
 	 * get_active_post_types() returns an array.
 	 */
 	public function test_get_active_post_types_returns_array(): void {
-		$this->assertIsArray( $this->registration->get_active_post_types() );
+		$this->assertIsArray( Tiptap_Editor_Editor_Registration::get_active_post_types() );
 	}
 
 	/**
