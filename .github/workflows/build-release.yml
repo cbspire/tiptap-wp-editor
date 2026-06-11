@@ -1,0 +1,63 @@
+name: Build & Release
+
+# Every push to main rebuilds the JS bundles, packages the plugin zip
+# (respecting .distignore), and publishes it to a rolling pre-release
+# tagged "latest" titled "latest-<date>". The WordPress Playground
+# blueprint (blueprint.json) installs the plugin from that release.
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-release
+  cancel-in-progress: true
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build assets
+        run: npm run build
+
+      - name: Package plugin zip
+        run: |
+          echo "BUILD_DATE=$(date -u +%Y-%m-%d)" >> "$GITHUB_ENV"
+          mkdir -p /tmp/package/tiptap-editor
+          rsync -a ./ /tmp/package/tiptap-editor/ \
+            --exclude-from=.distignore \
+            --exclude='.git' \
+            --exclude='.github'
+          cd /tmp/package
+          zip -rq "$GITHUB_WORKSPACE/tiptap-editor.zip" tiptap-editor
+          unzip -l "$GITHUB_WORKSPACE/tiptap-editor.zip"
+
+      - name: Publish rolling "latest" release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete latest --repo "$GITHUB_REPOSITORY" --yes --cleanup-tag || true
+          gh release create latest "tiptap-editor.zip" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "latest-${BUILD_DATE}" \
+            --prerelease \
+            --notes "Automated development build of \`main\` (${GITHUB_SHA:0:7}) on ${BUILD_DATE} (UTC).
+
+          Install: upload \`tiptap-editor.zip\` via **Plugins → Add New → Upload Plugin**, or [try it in WordPress Playground](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/blueprint.json)."

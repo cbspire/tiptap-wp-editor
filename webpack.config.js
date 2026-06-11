@@ -23,6 +23,13 @@ module.exports = {
 		...defaultConfig.output,
 		path: path.resolve( __dirname, 'assets' ),
 		filename: 'js/[name].js',
+		// Keep lazy-loaded chunks (toolbar, AI menu) next to the entry bundles.
+		chunkFilename: 'js/[name].js',
+		// The default config cleans the whole output directory before each
+		// build, which would delete the hand-authored CSS in assets/css/.
+		clean: {
+			keep: /^css\//,
+		},
 	},
 	module: {
 		...defaultConfig.module,
