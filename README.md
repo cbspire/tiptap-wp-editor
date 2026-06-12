@@ -32,7 +32,7 @@ The demo installs the `tiptap-editor.zip` asset from the rolling [`latest` relea
 
 ### From the latest build
 
-1. Download `tiptap-editor.zip` from the [`latest` release](https://github.com/cbspire/tiptap-wp-editor/releases/tag/latest).
+1. Download [`tiptap-editor.zip`](https://github.com/cbspire/tiptap-wp-editor/releases/download/latest/tiptap-editor.zip) from the [`latest` release](https://github.com/cbspire/tiptap-wp-editor/releases/tag/latest).
 2. In wp-admin, go to **Plugins → Add New → Upload Plugin** and upload the zip.
 3. Activate, then go to **Settings → TipTap Editor** and choose which post types should use the editor.
 
