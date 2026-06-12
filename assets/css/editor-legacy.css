@@ -77,6 +77,57 @@
 }
 
 /* =========================================================================
+   Slash command menu
+   ========================================================================= */
+
+.tiptap-slash-menu {
+	background: #fff;
+	border-color: var(--tiptap-border);
+	color: var(--tiptap-text);
+}
+
+.tiptap-slash-menu__item.is-selected,
+.tiptap-slash-menu__item:hover {
+	background: var(--tiptap-active-bg);
+	color: var(--tiptap-primary);
+}
+
+.tiptap-slash-menu__icon {
+	border-color: var(--tiptap-border);
+	background: #fff;
+}
+
+/* =========================================================================
+   Bubble menu
+   ========================================================================= */
+
+.tiptap-bubble-menu {
+	background: #fff;
+	border-color: var(--tiptap-border);
+	color: var(--tiptap-text);
+}
+
+.tiptap-bubble-menu__button {
+	color: var(--tiptap-text);
+}
+
+.tiptap-bubble-menu__button:hover,
+.tiptap-bubble-menu__button.is-active {
+	background: var(--tiptap-active-bg);
+	border-color: var(--tiptap-active-border);
+	color: var(--tiptap-primary);
+}
+
+/* =========================================================================
+   Drag handle
+   ========================================================================= */
+
+.tiptap-drag-handle__plus,
+.tiptap-drag-handle__grip {
+	color: var(--tiptap-text-muted);
+}
+
+/* =========================================================================
    Shortcode chip
    ========================================================================= */
 

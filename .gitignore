@@ -10,3 +10,4 @@ Thumbs.db
 # Hand-authored stylesheets in assets/css/ remain tracked.
 /assets/js/
 /assets/css/style-*.css
+demo/build/

@@ -16,11 +16,15 @@ import { StarterKit } from '@tiptap/starter-kit';
 import { Image } from '@tiptap/extension-image';
 import { Link } from '@tiptap/extension-link';
 import { Underline } from '@tiptap/extension-underline';
+import { Placeholder } from '@tiptap/extension-placeholder';
 
 import { WPShortcode } from './extensions/shortcode';
 import { WPReadMore } from './extensions/read-more';
 import { WPRawHTML } from './extensions/raw-html';
 import { WPImage } from './extensions/wp-image';
+import { WPImageUpload } from './extensions/image-upload';
+import { WPDragHandle } from './extensions/drag-handle';
+import { SlashCommand } from './extensions/slash-command';
 
 /**
  * Data injected by PHP via wp_localize_script.
@@ -34,6 +38,8 @@ declare global {
 			nonce: string;
 			postId: number;
 			postType: string;
+			mediaRestUrl?: string;
+			canUploadFiles?: boolean;
 		};
 	}
 }
@@ -47,7 +53,9 @@ function bootEditor(): void {
 		return;
 	}
 
-	const contentTextarea = document.getElementById( 'content' ) as HTMLTextAreaElement | null;
+	const contentTextarea = document.getElementById(
+		'content'
+	) as HTMLTextAreaElement | null;
 	if ( ! contentTextarea ) {
 		return;
 	}
@@ -78,10 +86,19 @@ function bootEditor(): void {
 			},
 		} ),
 		Image,
+		Placeholder.configure( {
+			placeholder: ( { node } ) =>
+				node.type.name === 'heading'
+					? 'Heading'
+					: 'Type “/” for commands…',
+		} ),
 		WPShortcode,
 		WPReadMore,
 		WPRawHTML,
 		WPImage,
+		WPImageUpload,
+		WPDragHandle,
+		SlashCommand,
 	];
 
 	// Create the editor.
@@ -99,44 +116,78 @@ function bootEditor(): void {
 	// Set initial textarea value.
 	contentTextarea.value = editor.getHTML();
 
-	// Mount toolbar.
-	mountToolbar( editor, mountEl );
+	// Mount the slim toolbar above the editor.
+	const toolbarRow = mountToolbar( editor, mountEl );
 
-	// Conditionally mount AI menu.
+	// Mount the floating bubble menu (shows on text selection).
+	mountBubbleMenu( editor );
+
+	// Conditionally mount AI menu into the toolbar row.
 	const showAiMenu = window.tiptapEditorData?.hasAbilitiesApi === true;
 	if ( showAiMenu ) {
-		mountAiMenu( editor, mountEl );
+		mountAiMenu( editor, toolbarRow );
 	}
 }
 
 /**
- * Mount the main toolbar above the editor.
+ * Mount the slim toolbar above the editor.
+ *
+ * Returns the toolbar row element so other UI (AI menu) can be
+ * appended next to the React-managed button group.
+ * @param editor
+ * @param container
  */
-function mountToolbar( editor: Editor, container: HTMLElement ): void {
-	const toolbarEl = document.createElement( 'div' );
-	toolbarEl.id = 'tiptap-toolbar';
-	toolbarEl.className = 'tiptap-toolbar';
-	container.insertAdjacentElement( 'beforebegin', toolbarEl );
+function mountToolbar( editor: Editor, container: HTMLElement ): HTMLElement {
+	const rowEl = document.createElement( 'div' );
+	rowEl.id = 'tiptap-toolbar';
+	rowEl.className = 'tiptap-toolbar';
+	container.insertAdjacentElement( 'beforebegin', rowEl );
+
+	// React renders into its own child so siblings (AI menu) survive.
+	const mainEl = document.createElement( 'div' );
+	mainEl.className = 'tiptap-toolbar__main';
+	rowEl.appendChild( mainEl );
 
 	// Lazy-import the React toolbar component.
-	import( './toolbar/Toolbar' ).then( ( { Toolbar } ) => {
-		// Toolbar mounts itself into toolbarEl via React.
-		Toolbar.mount( toolbarEl, editor );
-	} ).catch( ( err: unknown ) => {
-		console.error( '[TipTap] Failed to load toolbar:', err );
-	} );
+	import( './toolbar/Toolbar' )
+		.then( ( { Toolbar } ) => {
+			Toolbar.mount( mainEl, editor );
+		} )
+		.catch( ( err: unknown ) => {
+			console.error( '[TipTap] Failed to load toolbar:', err );
+		} );
+
+	return rowEl;
+}
+
+/**
+ * Mount the floating bubble menu (formatting bar on text selection).
+ * @param editor
+ */
+function mountBubbleMenu( editor: Editor ): void {
+	import( './toolbar/BubbleMenu' )
+		.then( ( { BubbleMenu } ) => {
+			BubbleMenu.mount( editor );
+		} )
+		.catch( ( err: unknown ) => {
+			console.error( '[TipTap] Failed to load bubble menu:', err );
+		} );
 }
 
 /**
  * Mount the AI menu (WP 7.0+ only).
  * Only called when hasAbilitiesApi === true.
+ * @param editor
+ * @param container
  */
 function mountAiMenu( editor: Editor, container: HTMLElement ): void {
-	import( './toolbar/AIMenu' ).then( ( { AIMenu } ) => {
-		AIMenu.mount( container, editor );
-	} ).catch( ( err: unknown ) => {
-		console.error( '[TipTap] Failed to load AI menu:', err );
-	} );
+	import( './toolbar/AIMenu' )
+		.then( ( { AIMenu } ) => {
+			AIMenu.mount( container, editor );
+		} )
+		.catch( ( err: unknown ) => {
+			console.error( '[TipTap] Failed to load AI menu:', err );
+		} );
 }
 
 // Boot on DOM ready.

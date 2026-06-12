@@ -11,6 +11,26 @@ A modern, focused rich text editor for WordPress built on [TipTap](https://tipta
 
 The demo installs the `tiptap-editor.zip` asset from the rolling [`latest` release](https://github.com/cbspire/tiptap-wp-editor/releases/tag/latest), which is rebuilt automatically on every push to `main`.
 
+## A Notion-style writing experience
+
+![Editor overview: slim toolbar, placeholder text and block drag handle](docs/screenshots/editor-overview.png)
+
+- **Slash commands** — type `/` on any line to open a filterable block palette: headings, lists, quotes, code blocks, dividers, images, read-more, shortcodes and raw HTML. Navigate with `↑` `↓` `Enter`.
+
+  ![Slash command menu](docs/screenshots/slash-menu.png)
+
+  Keep typing to filter — `/im` narrows it down to image blocks:
+
+  ![Filtered slash command menu](docs/screenshots/slash-menu-filtered.png)
+
+- **Floating formatting bar** — select text and a bubble menu appears with bold, italic, underline, strikethrough, inline code, headings, quote and an inline link editor.
+
+  ![Bubble menu on text selection](docs/screenshots/bubble-menu.png)
+
+- **Image uploads** — drag & drop or paste images straight into the editor; they upload to the Media Library via the REST API (with an animated placeholder while uploading, and a graceful error notice on failure). The Media Library picker is still one `/image` away.
+- **Block drag handles** — hover any block for the Notion-style ⠿ grip: drag to reorder, or hit `+` to add a block below. Pointer devices only; on touch the slim toolbar has you covered.
+- **Placeholder hints** — empty lines show *"Type "/" for commands…"* so the features stay discoverable.
+
 ## Features
 
 - **Drop-in TinyMCE replacement** — saves plain HTML to `post_content`, exactly like TinyMCE. Zero content migration, in either direction.
@@ -89,6 +109,15 @@ composer install    # PHP dev tooling
 vendor/bin/phpcs --standard=WordPress includes/   # PHP coding standards
 vendor/bin/phpunit                                # PHP unit tests
 ```
+
+#### Standalone demo (no WordPress needed)
+
+```bash
+npx wp-scripts build --config demo/webpack.config.js
+open demo/index.html   # or just open it in a browser
+```
+
+Builds a self-contained bundle (nothing externalised) and runs the real editor on a plain HTML page — handy for quick UI work and for regenerating the screenshots above.
 
 Built files are **not** committed — `assets/js/` and the generated `assets/css/style-*.css` are gitignored and produced by `npm run build`. Only the hand-authored stylesheets in `assets/css/` live in the repo. CI builds the bundles on every push to `main`, so the release zip (and the Playground demo) always contains compiled assets; installing straight from a git checkout requires running the build first.
 

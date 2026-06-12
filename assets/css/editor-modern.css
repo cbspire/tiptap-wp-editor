@@ -65,6 +65,60 @@
 }
 
 /* =========================================================================
+   Slash command menu
+   ========================================================================= */
+
+.tiptap-slash-menu {
+	background: var(--wp--color--background, #fff);
+	border-color: var(--wp--color--border, #c3c4c7);
+	border-radius: var(--wp--border-radius, 6px);
+	color: var(--wp--color--foreground, #1e1e1e);
+	font-family: var(--wp--font-family, -apple-system, sans-serif);
+}
+
+.tiptap-slash-menu__item.is-selected,
+.tiptap-slash-menu__item:hover {
+	background: var(--wp-admin-theme-color-lighter-20, #e8f0fb);
+	color: var(--wp-admin-theme-color, #3858e9);
+}
+
+.tiptap-slash-menu__icon {
+	border-color: var(--wp--color--border, #c3c4c7);
+	background: var(--wp--color--background, #fff);
+}
+
+/* =========================================================================
+   Bubble menu
+   ========================================================================= */
+
+.tiptap-bubble-menu {
+	background: var(--wp--color--background, #fff);
+	border-color: var(--wp--color--border, #c3c4c7);
+	border-radius: var(--wp--border-radius, 6px);
+	color: var(--wp--color--foreground, #1e1e1e);
+}
+
+.tiptap-bubble-menu__button {
+	color: var(--wp--color--foreground, #1d2327);
+}
+
+.tiptap-bubble-menu__button:hover,
+.tiptap-bubble-menu__button.is-active {
+	background: var(--wp-admin-theme-color-lighter-20, #e8f0fb);
+	border-color: var(--wp-admin-theme-color, #3858e9);
+	color: var(--wp-admin-theme-color, #3858e9);
+}
+
+/* =========================================================================
+   Drag handle
+   ========================================================================= */
+
+.tiptap-drag-handle__plus,
+.tiptap-drag-handle__grip {
+	color: var(--wp--color--foreground-secondary, #646970);
+}
+
+/* =========================================================================
    Shortcode chip
    ========================================================================= */
 

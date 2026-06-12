@@ -13,7 +13,10 @@ README.md
 package.json
 package-lock.json
 tsconfig.json
+vitest.config.ts
 webpack.config.js
+demo/
+docs/
 phpcs.xml.dist
 phpstan.neon
 phpunit.xml.dist

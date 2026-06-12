@@ -1,11 +1,14 @@
 /**
- * Main Toolbar Component.
+ * Slim Toolbar Component.
  *
- * Renders formatting buttons for the TipTap editor. Uses @wordpress/element
- * (externalised React) so it works on WP 6.8+ without bundling React.
+ * A reduced top toolbar with the essentials (basic marks, image,
+ * read-more, undo/redo) — kept mainly for touch devices. The full
+ * formatting surface lives in the Notion-style slash command menu
+ * (type "/") and the floating bubble menu on text selection.
  *
- * The toolbar is the same HTML structure on all WP versions.
- * Visual styling is controlled by CSS: editor-legacy.css or editor-modern.css.
+ * Uses @wordpress/element (externalised React) so it works on WP 6.8+
+ * without bundling React. Same HTML structure on all WP versions;
+ * visual styling comes from editor-legacy.css or editor-modern.css.
  */
 
 import { createElement, render } from '@wordpress/element';
@@ -19,7 +22,13 @@ interface ToolbarButtonProps {
 	onClick: () => void;
 }
 
-function ToolbarButton( { label, icon, isActive, isDisabled, onClick }: ToolbarButtonProps ) {
+function ToolbarButton( {
+	label,
+	icon,
+	isActive,
+	isDisabled,
+	onClick,
+}: ToolbarButtonProps ) {
 	return createElement(
 		'button',
 		{
@@ -28,10 +37,12 @@ function ToolbarButton( { label, icon, isActive, isDisabled, onClick }: ToolbarB
 			'aria-label': label,
 			'aria-pressed': isActive,
 			disabled: isDisabled,
-			className: `tiptap-toolbar__button${ isActive ? ' is-active' : '' }`,
+			className: `tiptap-toolbar__button${
+				isActive ? ' is-active' : ''
+			}`,
 			onClick,
 		},
-		icon,
+		icon
 	);
 }
 
@@ -40,23 +51,12 @@ interface ToolbarProps {
 }
 
 function ToolbarComponent( { editor }: ToolbarProps ) {
-	// Re-render on every selection change.
-	const [ , forceUpdate ] = ( () => {
-		let state = 0;
-		return [
-			state,
-			() => {
-				// In React 18+: use useReducer. For now trigger via editor event.
-			},
-		];
-	} )();
-
-	const buttons: Array<{
+	const buttons: Array< {
 		label: string;
 		icon: string;
 		isActive: () => boolean;
 		action: () => void;
-	}> = [
+	} > = [
 		{
 			label: 'Bold',
 			icon: 'B',
@@ -74,65 +74,6 @@ function ToolbarComponent( { editor }: ToolbarProps ) {
 			icon: 'U',
 			isActive: () => editor.isActive( 'underline' ),
 			action: () => editor.chain().focus().toggleUnderline().run(),
-		},
-		{
-			label: 'Strikethrough',
-			icon: 'S̶',
-			isActive: () => editor.isActive( 'strike' ),
-			action: () => editor.chain().focus().toggleStrike().run(),
-		},
-		{
-			label: 'Link',
-			icon: '🔗',
-			isActive: () => editor.isActive( 'link' ),
-			action: () => {
-				const url = window.prompt( 'URL:' );
-				if ( url ) {
-					editor.chain().focus().setLink( { href: url } ).run();
-				}
-			},
-		},
-		{
-			label: 'Unlink',
-			icon: '⛓️',
-			isActive: () => false,
-			action: () => editor.chain().focus().unsetLink().run(),
-		},
-		{
-			label: 'Heading 2',
-			icon: 'H2',
-			isActive: () => editor.isActive( 'heading', { level: 2 } ),
-			action: () => editor.chain().focus().toggleHeading( { level: 2 } ).run(),
-		},
-		{
-			label: 'Heading 3',
-			icon: 'H3',
-			isActive: () => editor.isActive( 'heading', { level: 3 } ),
-			action: () => editor.chain().focus().toggleHeading( { level: 3 } ).run(),
-		},
-		{
-			label: 'Bulleted list',
-			icon: '• —',
-			isActive: () => editor.isActive( 'bulletList' ),
-			action: () => editor.chain().focus().toggleBulletList().run(),
-		},
-		{
-			label: 'Numbered list',
-			icon: '1 —',
-			isActive: () => editor.isActive( 'orderedList' ),
-			action: () => editor.chain().focus().toggleOrderedList().run(),
-		},
-		{
-			label: 'Blockquote',
-			icon: '"',
-			isActive: () => editor.isActive( 'blockquote' ),
-			action: () => editor.chain().focus().toggleBlockquote().run(),
-		},
-		{
-			label: 'Code block',
-			icon: '</>',
-			isActive: () => editor.isActive( 'codeBlock' ),
-			action: () => editor.chain().focus().toggleCodeBlock().run(),
 		},
 		{
 			label: 'Insert Read More',
@@ -162,7 +103,11 @@ function ToolbarComponent( { editor }: ToolbarProps ) {
 
 	return createElement(
 		'div',
-		{ className: 'tiptap-toolbar', role: 'toolbar', 'aria-label': 'Editor toolbar' },
+		{
+			className: 'tiptap-toolbar__group',
+			role: 'toolbar',
+			'aria-label': 'Editor toolbar',
+		},
 		buttons.map( ( btn ) =>
 			createElement( ToolbarButton, {
 				key: btn.label,
@@ -171,8 +116,8 @@ function ToolbarComponent( { editor }: ToolbarProps ) {
 				isActive: btn.isActive(),
 				isDisabled: false,
 				onClick: btn.action,
-			} ),
-		),
+			} )
+		)
 	);
 }
 
