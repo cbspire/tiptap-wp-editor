@@ -16,9 +16,7 @@ import { mergeAttributes } from '@tiptap/core';
 declare global {
 	interface Window {
 		wp?: {
-			media?: (
-				options: Record<string, unknown>,
-			) => {
+			media?: ( options: Record< string, unknown > ) => {
 				open: () => void;
 				on: ( event: string, callback: () => void ) => void;
 				state: () => {
@@ -40,7 +38,7 @@ declare global {
 }
 
 declare module '@tiptap/core' {
-	interface Commands<ReturnType> {
+	interface Commands< ReturnType > {
 		wpImage: {
 			/** Open the WP Media Library and insert the selected image */
 			insertWPImage: () => ReturnType;
@@ -62,16 +60,30 @@ export const WPImage = Image.extend( {
 					return id ? parseInt( id, 10 ) : null;
 				},
 				renderHTML: ( attributes ) => {
-					if ( ! attributes.attachmentId ) return {};
-					return { 'data-attachment-id': String( attributes.attachmentId ) };
+					if ( ! attributes.attachmentId ) {
+						return {};
+					}
+					return {
+						'data-attachment-id': String( attributes.attachmentId ),
+					};
 				},
+			},
+			// Transient marker used while a dropped/pasted file is uploading.
+			// Never parsed from or rendered to HTML — editor state only.
+			uploadId: {
+				default: null,
+				parseHTML: () => null,
+				renderHTML: () => ( {} ),
 			},
 			// Standard WP image class (e.g. wp-image-42, alignleft, size-large)
 			class: {
 				default: null,
-				parseHTML: ( element ) => element.getAttribute( 'class' ) ?? null,
+				parseHTML: ( element ) =>
+					element.getAttribute( 'class' ) ?? null,
 				renderHTML: ( attributes ) => {
-					if ( ! attributes.class ) return {};
+					if ( ! attributes.class ) {
+						return {};
+					}
 					return { class: attributes.class as string };
 				},
 			},
@@ -111,6 +123,7 @@ export const WPImage = Image.extend( {
 /**
  * Open the WordPress Media Library modal and invoke the callback with the
  * selected attachment data.
+ * @param onSelect
  */
 function openMediaLibrary(
 	onSelect: ( data: {
@@ -119,10 +132,12 @@ function openMediaLibrary(
 		alt: string;
 		width: number;
 		height: number;
-	} ) => void,
+	} ) => void
 ): void {
 	if ( ! window.wp?.media ) {
-		console.warn( '[TipTap] wp.media is not available. Is the media library loaded?' );
+		console.warn(
+			'[TipTap] wp.media is not available. Is the media library loaded?'
+		);
 		return;
 	}
 

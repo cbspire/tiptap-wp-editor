@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>TipTap Editor for WordPress — Demo</title>
+	<link rel="stylesheet" href="../assets/css/editor.css">
+	<link rel="stylesheet" href="../assets/css/editor-legacy.css">
+	<style>
+		/* Approximation of the WP admin post screen, for the demo only. */
+		body {
+			margin: 0;
+			padding: 32px;
+			background: #f0f0f1;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+		}
+		.demo-wrap {
+			max-width: 840px;
+			margin: 0 auto;
+		}
+		.demo-title {
+			width: 100%;
+			box-sizing: border-box;
+			margin-bottom: 16px;
+			padding: 8px 12px;
+			border: 1px solid #c3c4c7;
+			border-radius: 4px;
+			font-size: 1.5em;
+			background: #fff;
+		}
+	</style>
+</head>
+<body>
+	<div class="demo-wrap">
+		<input type="text" class="demo-title" placeholder="Add title" value="A Notion-style editor for WordPress">
+
+		<div id="tiptap-editor-root"
+			data-post-id="1"
+			data-content="&quot;&lt;h2&gt;Write like in Notion&lt;/h2&gt;&lt;p&gt;Type &lt;strong&gt;/&lt;/strong&gt; on an empty line to insert blocks: headings, lists, images, quotes, code, shortcodes and more.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Select text to get a &lt;em&gt;floating formatting bar&lt;/em&gt;&lt;/li&gt;&lt;li&gt;Drag &amp;amp; drop or paste images — they upload to the Media Library&lt;/li&gt;&lt;li&gt;Hover a block for the ⠿ drag handle&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;/p&gt;&quot;"
+		></div>
+		<textarea id="content" name="content" style="display:none"></textarea>
+	</div>
+
+	<script src="build/demo.js"></script>
+</body>
+</html>

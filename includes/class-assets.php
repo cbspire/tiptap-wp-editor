@@ -45,6 +45,9 @@ class Tiptap_Editor_Assets {
 			return;
 		}
 
+		// Media modal (Insert Image button) and upload support.
+		wp_enqueue_media( [ 'post' => $post ] );
+
 		$asset = $this->asset_meta(
 			'assets/js/editor.asset.php',
 			[ 'wp-element', 'wp-i18n', 'wp-hooks' ]
@@ -68,6 +71,8 @@ class Tiptap_Editor_Assets {
 				'hasAbilitiesApi' => Tiptap_Editor_Version_Compat::has_abilities_api(),
 				'hasAiClient'     => Tiptap_Editor_Version_Compat::has_ai_client(),
 				'restUrl'         => rest_url( 'tiptap-editor/v1/' ),
+				'mediaRestUrl'    => rest_url( 'wp/v2/media' ),
+				'canUploadFiles'  => current_user_can( 'upload_files' ),
 				'nonce'           => wp_create_nonce( 'wp_rest' ),
 				'postId'          => $post->ID,
 				'postType'        => $post->post_type,
