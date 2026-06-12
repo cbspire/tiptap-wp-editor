@@ -32,7 +32,7 @@ class Test_Meta_Box extends WP_UnitTestCase {
 	 */
 	public function test_add_field_without_id_is_ignored(): void {
 		// Should not throw.
-		$this->meta_box->add_field( [ 'post_types' => [ 'post' ] ] );
+		Tiptap_Editor_Meta_Box::add_field( [ 'post_types' => [ 'post' ] ] );
 		$this->assertTrue( true );
 	}
 
@@ -40,7 +40,7 @@ class Test_Meta_Box extends WP_UnitTestCase {
 	 * add_field() stores default values correctly.
 	 */
 	public function test_add_field_defaults(): void {
-		$this->meta_box->add_field( [
+		Tiptap_Editor_Meta_Box::add_field( [
 			'id'         => 'test_field',
 			'post_types' => [ 'post' ],
 		] );

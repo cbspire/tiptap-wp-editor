@@ -26,6 +26,10 @@ define( 'TIPTAP_EDITOR_DIR', plugin_dir_path( __FILE__ ) );
 define( 'TIPTAP_EDITOR_URL', plugin_dir_url( __FILE__ ) );
 define( 'TIPTAP_EDITOR_SLUG', 'tiptap-editor' );
 
+// Public helper functions (tiptap_field(), tiptap_editor_is_active_post_type()).
+// Loaded eagerly so themes/plugins can call them at any point.
+require_once TIPTAP_EDITOR_DIR . 'includes/functions.php';
+
 // Autoloader.
 spl_autoload_register( function ( string $class_name ): void {
 	// Only handle classes with the plugin prefix.
@@ -43,8 +47,13 @@ spl_autoload_register( function ( string $class_name ): void {
 	}
 } );
 
+// Load translations on 'init' — loading earlier triggers
+// _load_textdomain_just_in_time notices on WP 6.7+.
+add_action( 'init', function (): void {
+	load_plugin_textdomain( 'tiptap-editor', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+}, 0 );
+
 // Bootstrap the plugin.
 add_action( 'plugins_loaded', function (): void {
-	load_plugin_textdomain( 'tiptap-editor', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 	Tiptap_Editor_Plugin::get_instance();
 } );

@@ -35,12 +35,16 @@ class Tiptap_Editor_Version_Compat {
 	}
 
 	/**
-	 * Whether the current WP installation supports DataViews components.
+	 * Whether the modern DataViews settings UI should be used.
 	 * Requires WP 7.0+.
+	 *
+	 * Note: @wordpress/dataviews is NOT a registered core script handle —
+	 * it is bundled into settings-modern.js at build time. This flag only
+	 * gates the UI tier on the WP version (design tokens, component
+	 * versions), not on a core script being available.
 	 */
 	public static function has_dataviews(): bool {
-		return wp_script_is( 'wp-dataviews', 'registered' )
-			&& version_compare( get_bloginfo( 'version' ), '7.0', '>=' );
+		return version_compare( get_bloginfo( 'version' ), '7.0', '>=' );
 	}
 
 	/**

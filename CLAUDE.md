@@ -59,7 +59,7 @@ tiptap-wp-editor/
 │   └── admin/
 │       ├── settings-legacy.tsx      # Settings UI for WP 6.8/6.9
 │       └── settings-modern.tsx      # Settings UI for WP 7.0+ (DataViews)
-├── assets/                          # Compiled JS/CSS — committed to repo (WP.org convention)
+├── assets/                          # JS/generated CSS gitignored (built by CI); hand-authored CSS tracked
 │   ├── js/
 │   │   ├── editor.js                # Single bundle for all WP versions
 │   │   ├── settings-legacy.js       # Settings UI for WP 6.8/6.9
@@ -135,7 +135,7 @@ It correctly externalises all `@wordpress/*` packages so they load from WP core 
 
 ### Compiled Assets Policy
 
-`assets/` **is committed to the repo**. This is WordPress.org convention — the plugin must work without a build step for end users and reviewers. `src/`, `node_modules/`, `package.json`, `tsconfig.json`, `webpack.config.js`, and test files are listed in `.distignore` and excluded from the SVN deploy.
+Built files are **not committed**: `assets/js/` and the generated `assets/css/style-*.css` are gitignored and produced by `npm run build`. Only the hand-authored stylesheets in `assets/css/` (admin.css, editor.css, editor-legacy.css, editor-modern.css) are tracked. The CI workflow builds the bundles on every push to `main` and packages them into the release zip, so distributed artifacts (release zip, WP.org SVN deploy) always include compiled assets. `src/`, `node_modules/`, `package.json`, `tsconfig.json`, `webpack.config.js`, and test files are listed in `.distignore` and excluded from the SVN deploy.
 
 ---
 
@@ -474,7 +474,7 @@ Cover these cases in `converter.test.ts`:
 
 ## WP.org Submission Notes
 
-- **Compiled assets** (`assets/`) must be committed alongside `src/` so reviewers can build
+- **Compiled assets** (`assets/`) are produced by CI (`npm run build`) and shipped in the deploy zip alongside buildable `src/`; they are not committed to git
 - **TipTap** (MIT licensed) is compiled into the bundle; no `node_modules/` in SVN
 - **AI features** make zero external calls — all go through WP core's Abilities API; no external service disclosure required from this plugin
 - **`wpautop` removal** only occurs for post types where the user has explicitly enabled TipTap; document this clearly in `readme.txt`

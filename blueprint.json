@@ -1,0 +1,46 @@
+{
+	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+	"meta": {
+		"title": "TipTap Editor for WordPress",
+		"description": "Try TipTap Editor — a modern TipTap/ProseMirror-based replacement for TinyMCE.",
+		"author": "cbspire"
+	},
+	"preferredVersions": {
+		"php": "8.2",
+		"wp": "7.0"
+	},
+	"features": {
+		"networking": true
+	},
+	"login": true,
+	"landingPage": "/wp-admin/options-general.php?page=tiptap-editor",
+	"steps": [
+		{
+			"step": "installPlugin",
+			"pluginData": {
+				"resource": "wordpress.org/plugins",
+				"slug": "classic-editor"
+			},
+			"options": {
+				"activate": true
+			}
+		},
+		{
+			"step": "installPlugin",
+			"pluginData": {
+				"resource": "url",
+				"url": "https://github-proxy.com/proxy/?repo=cbspire/tiptap-wp-editor&release=latest&asset=tiptap-editor.zip"
+			},
+			"options": {
+				"activate": true
+			}
+		},
+		{
+			"step": "setSiteOptions",
+			"options": {
+				"tiptap_editor_post_types": [ "post" ],
+				"tiptap_editor_toolbar_preset": "standard"
+			}
+		}
+	]
+}

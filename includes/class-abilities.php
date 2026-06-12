@@ -21,12 +21,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Tiptap_Editor_Abilities {
 
 	/**
+	 * Maximum ability executions allowed per user within the rate window.
+	 */
+	private const RATE_LIMIT = 30;
+
+	/**
+	 * Rate limit window in seconds.
+	 */
+	private const RATE_WINDOW = 5 * MINUTE_IN_SECONDS;
+
+	/**
 	 * Register WordPress hooks.
 	 *
 	 * Only called when Tiptap_Editor_Version_Compat::has_abilities_api() === true.
 	 */
 	public function register(): void {
-		add_action( 'init', [ $this, 'register_abilities' ] );
+		// Called from Plugin::init() which already runs on 'init' — hooking
+		// 'init' again here would never fire. Register abilities directly.
+		$this->register_abilities();
 		add_action( 'rest_api_init', [ $this, 'register_rest_routes' ] );
 	}
 
@@ -166,6 +178,14 @@ class Tiptap_Editor_Abilities {
 			);
 		}
 
+		if ( ! $this->check_rate_limit( get_current_user_id() ) ) {
+			return new WP_Error(
+				'tiptap_rate_limited',
+				__( 'Too many AI requests. Please wait a few minutes and try again.', 'tiptap-editor' ),
+				[ 'status' => 429 ]
+			);
+		}
+
 		$ability = (string) $request->get_param( 'ability' );
 		$input   = $request->get_param( 'input' );
 		$context = (array) ( $request->get_param( 'context' ) ?? [] );
@@ -180,6 +200,28 @@ class Tiptap_Editor_Abilities {
 	}
 
 	/**
+	 * Check and consume one rate limit slot for a user.
+	 *
+	 * Sliding-window counter stored in a transient. Fails open only in the
+	 * sense that the first request of a window always succeeds.
+	 *
+	 * @param  int $user_id Current user ID.
+	 * @return bool True if the request is allowed, false if rate limited.
+	 */
+	private function check_rate_limit( int $user_id ): bool {
+		$key   = 'tiptap_ability_rate_' . $user_id;
+		$count = (int) get_transient( $key );
+
+		if ( $count >= self::RATE_LIMIT ) {
+			return false;
+		}
+
+		set_transient( $key, $count + 1, self::RATE_WINDOW );
+
+		return true;
+	}
+
+	/**
 	 * Ability callback: improve writing.
 	 *
 	 * @param  string $input Selected text.
@@ -191,7 +233,7 @@ class Tiptap_Editor_Abilities {
 		}
 
 		$prompt = sprintf(
-			'Rewrite the following text to improve its clarity and flow. Return only the improved text, no explanation:\n\n%s',
+			"Rewrite the following text to improve its clarity and flow. Return only the improved text, no explanation:\n\n%s",
 			$input
 		);
 
@@ -210,7 +252,7 @@ class Tiptap_Editor_Abilities {
 		}
 
 		$prompt = sprintf(
-			'Summarise the following text in 1-2 sentences. Return only the summary:\n\n%s',
+			"Summarise the following text in 1-2 sentences. Return only the summary:\n\n%s",
 			$input
 		);
 
@@ -229,7 +271,7 @@ class Tiptap_Editor_Abilities {
 		}
 
 		$prompt = sprintf(
-			'Expand the following text with more detail and context. Return only the expanded text:\n\n%s',
+			"Expand the following text with more detail and context. Return only the expanded text:\n\n%s",
 			$input
 		);
 
@@ -259,7 +301,7 @@ class Tiptap_Editor_Abilities {
 		$tone_desc = $tone_descriptions[ $tone ] ?? 'professional and formal';
 
 		$prompt = sprintf(
-			'Rewrite the following text in a %s tone. Return only the rewritten text:\n\n%s',
+			"Rewrite the following text in a %s tone. Return only the rewritten text:\n\n%s",
 			$tone_desc,
 			$text
 		);

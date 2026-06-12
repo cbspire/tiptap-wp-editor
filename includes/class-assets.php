@@ -45,17 +45,20 @@ class Tiptap_Editor_Assets {
 			return;
 		}
 
-		$js_path  = TIPTAP_EDITOR_DIR . 'assets/js/editor.js';
-		$js_url   = TIPTAP_EDITOR_URL . 'assets/js/editor.js';
-		$js_ver   = file_exists( $js_path ) ? (string) filemtime( $js_path ) : TIPTAP_EDITOR_VERSION;
+		$asset = $this->asset_meta(
+			'assets/js/editor.asset.php',
+			[ 'wp-element', 'wp-i18n', 'wp-hooks' ]
+		);
 
 		wp_enqueue_script(
 			'tiptap-editor',
-			$js_url,
-			[ 'wp-element', 'wp-i18n', 'wp-hooks' ],
-			$js_ver,
+			TIPTAP_EDITOR_URL . 'assets/js/editor.js',
+			$asset['dependencies'],
+			$asset['version'],
 			true
 		);
+
+		wp_set_script_translations( 'tiptap-editor', 'tiptap-editor', TIPTAP_EDITOR_DIR . 'languages' );
 
 		// Inject feature flags and editor data.
 		wp_localize_script(
@@ -71,7 +74,6 @@ class Tiptap_Editor_Assets {
 			]
 		);
 
-		// Base editor CSS (always loaded).
 		$this->enqueue_editor_css();
 	}
 
@@ -86,87 +88,146 @@ class Tiptap_Editor_Assets {
 		}
 
 		if ( Tiptap_Editor_Version_Compat::admin_ui_tier() === 'modern' ) {
-			$this->enqueue_modern_settings( $hook );
+			$this->enqueue_modern_settings();
 		} else {
-			$this->enqueue_legacy_settings( $hook );
+			$this->enqueue_legacy_settings();
 		}
 
 		// Shared admin CSS.
-		$css_path = TIPTAP_EDITOR_DIR . 'assets/css/admin.css';
-		$css_url  = TIPTAP_EDITOR_URL . 'assets/css/admin.css';
-		$css_ver  = file_exists( $css_path ) ? (string) filemtime( $css_path ) : TIPTAP_EDITOR_VERSION;
-
-		wp_enqueue_style( 'tiptap-editor-admin', $css_url, [], $css_ver );
+		wp_enqueue_style(
+			'tiptap-editor-admin',
+			TIPTAP_EDITOR_URL . 'assets/css/admin.css',
+			[],
+			$this->asset_version( 'assets/css/admin.css' )
+		);
 	}
 
 	/**
 	 * Enqueue the version-appropriate editor CSS tier.
 	 */
 	private function enqueue_editor_css(): void {
-		// Base editor CSS.
-		$base_css_path = TIPTAP_EDITOR_DIR . 'assets/css/editor.css';
-		$base_css_url  = TIPTAP_EDITOR_URL . 'assets/css/editor.css';
-		$base_css_ver  = file_exists( $base_css_path ) ? (string) filemtime( $base_css_path ) : TIPTAP_EDITOR_VERSION;
-
-		wp_enqueue_style( 'tiptap-editor-base', $base_css_url, [], $base_css_ver );
+		// Base editor CSS (always loaded).
+		wp_enqueue_style(
+			'tiptap-editor-base',
+			TIPTAP_EDITOR_URL . 'assets/css/editor.css',
+			[],
+			$this->asset_version( 'assets/css/editor.css' )
+		);
 
 		// Version-aware CSS tier.
 		if ( Tiptap_Editor_Version_Compat::has_design_tokens() ) {
 			$css_handle = 'tiptap-editor-modern';
 			$css_file   = 'editor-modern.css';
-			$deps       = [ 'tiptap-editor-base' ];
 		} else {
 			$css_handle = 'tiptap-editor-legacy';
 			$css_file   = 'editor-legacy.css';
-			$deps       = [ 'tiptap-editor-base' ];
 		}
 
-		$css_path = TIPTAP_EDITOR_DIR . 'assets/css/' . $css_file;
-		$css_url  = TIPTAP_EDITOR_URL . 'assets/css/' . $css_file;
-		$css_ver  = file_exists( $css_path ) ? (string) filemtime( $css_path ) : TIPTAP_EDITOR_VERSION;
-
-		wp_enqueue_style( $css_handle, $css_url, $deps, $css_ver );
+		wp_enqueue_style(
+			$css_handle,
+			TIPTAP_EDITOR_URL . 'assets/css/' . $css_file,
+			[ 'tiptap-editor-base' ],
+			$this->asset_version( 'assets/css/' . $css_file )
+		);
 	}
 
 	/**
 	 * Enqueue the legacy (WP 6.8/6.9) settings page JS.
-	 *
-	 * @param string $hook Admin page hook (unused, kept for signature consistency).
 	 */
-	private function enqueue_legacy_settings( string $hook ): void {
-		$js_path = TIPTAP_EDITOR_DIR . 'assets/js/settings-legacy.js';
-		$js_url  = TIPTAP_EDITOR_URL . 'assets/js/settings-legacy.js';
-		$js_ver  = file_exists( $js_path ) ? (string) filemtime( $js_path ) : TIPTAP_EDITOR_VERSION;
+	private function enqueue_legacy_settings(): void {
+		$asset = $this->asset_meta(
+			'assets/js/settings-legacy.asset.php',
+			[ 'wp-element', 'wp-i18n' ]
+		);
 
 		wp_enqueue_script(
 			'tiptap-editor-settings-legacy',
-			$js_url,
-			[ 'wp-element', 'wp-i18n' ],
-			$js_ver,
+			TIPTAP_EDITOR_URL . 'assets/js/settings-legacy.js',
+			$asset['dependencies'],
+			$asset['version'],
 			true
 		);
+
+		wp_set_script_translations( 'tiptap-editor-settings-legacy', 'tiptap-editor', TIPTAP_EDITOR_DIR . 'languages' );
 	}
 
 	/**
-	 * Enqueue the modern (WP 7.0+) settings page JS.
+	 * Enqueue the modern (WP 7.0+) settings page JS and styles.
 	 *
-	 * @param string $hook Admin page hook (unused, kept for signature consistency).
+	 * @wordpress/dataviews is bundled into the script (it is not a core
+	 * script handle); its stylesheet is emitted to css/settings-modern.css
+	 * at build time. All other @wordpress/* packages are externalised and
+	 * listed in the generated .asset.php file.
 	 */
-	private function enqueue_modern_settings( string $hook ): void {
-		wp_enqueue_script( 'wp-dataviews' );
-		wp_enqueue_script( 'wp-components' );
-		wp_enqueue_script( 'wp-element' );
-
-		$js_path = TIPTAP_EDITOR_DIR . 'assets/js/settings-modern.js';
-		$js_url  = TIPTAP_EDITOR_URL . 'assets/js/settings-modern.js';
-		$js_ver  = file_exists( $js_path ) ? (string) filemtime( $js_path ) : TIPTAP_EDITOR_VERSION;
+	private function enqueue_modern_settings(): void {
+		$asset = $this->asset_meta(
+			'assets/js/settings-modern.asset.php',
+			[ 'wp-api-fetch', 'wp-components', 'wp-element', 'wp-i18n' ]
+		);
 
 		wp_enqueue_script(
 			'tiptap-editor-settings-modern',
-			$js_url,
-			[ 'wp-dataviews', 'wp-components', 'wp-element', 'wp-i18n' ],
-			$js_ver,
+			TIPTAP_EDITOR_URL . 'assets/js/settings-modern.js',
+			$asset['dependencies'],
+			$asset['version'],
 			true
 		);
+
+		wp_set_script_translations( 'tiptap-editor-settings-modern', 'tiptap-editor', TIPTAP_EDITOR_DIR . 'languages' );
+
+		// DataViews/Cards rely on the wp-components stylesheet.
+		wp_enqueue_style( 'wp-components' );
+
+		wp_enqueue_style(
+			'tiptap-editor-settings-modern',
+			TIPTAP_EDITOR_URL . 'assets/css/style-settings-modern.css',
+			[ 'wp-components' ],
+			$this->asset_version( 'assets/css/style-settings-modern.css' )
+		);
+		wp_style_add_data( 'tiptap-editor-settings-modern', 'rtl', 'replace' );
+	}
+
+	/**
+	 * Read a generated .asset.php file (dependencies + version).
+	 *
+	 * Falls back to the given dependencies and the plugin version when the
+	 * file is missing (e.g. assets built by an older toolchain).
+	 *
+	 * @param  string   $relative_path Asset file path relative to the plugin root.
+	 * @param  string[] $fallback_deps Dependencies to use if the file is missing.
+	 * @return array{dependencies: string[], version: string}
+	 */
+	private function asset_meta( string $relative_path, array $fallback_deps ): array {
+		$path = TIPTAP_EDITOR_DIR . $relative_path;
+
+		if ( file_exists( $path ) ) {
+			$asset = require $path;
+			if ( is_array( $asset ) && isset( $asset['dependencies'], $asset['version'] ) ) {
+				return [
+					'dependencies' => (array) $asset['dependencies'],
+					'version'      => (string) $asset['version'],
+				];
+			}
+		}
+
+		return [
+			'dependencies' => $fallback_deps,
+			'version'      => TIPTAP_EDITOR_VERSION,
+		];
+	}
+
+	/**
+	 * Cache-busting version string for a plugin asset.
+	 *
+	 * Uses the file's mtime in development so changes bust caches
+	 * immediately; falls back to the plugin version.
+	 *
+	 * @param  string $relative_path Path relative to the plugin root.
+	 * @return string Version string.
+	 */
+	private function asset_version( string $relative_path ): string {
+		$path = TIPTAP_EDITOR_DIR . $relative_path;
+
+		return file_exists( $path ) ? (string) filemtime( $path ) : TIPTAP_EDITOR_VERSION;
 	}
 }

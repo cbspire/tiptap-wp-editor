@@ -149,9 +149,7 @@ class Tiptap_Editor_Admin_UI_Legacy {
 			$checked  = in_array( $post_type->name, $saved, true );
 			$disabled = $uses_block_editor;
 
-			printf(
-				'<label style="display:block;margin-bottom:4px;">',
-			);
+			echo '<label style="display:block;margin-bottom:4px;">';
 			printf(
 				'<input type="checkbox" name="tiptap_editor_post_types[]" value="%s"%s%s> %s',
 				esc_attr( $post_type->name ),

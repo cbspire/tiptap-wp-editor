@@ -1,267 +1,314 @@
 /**
  * Modern Settings Page (WP 7.0+).
  *
- * DataViews-native React app. Enqueues wp-dataviews, wp-components, wp-element.
- * Uses WP 7.0 design tokens throughout.
+ * React settings app built on @wordpress/dataviews. The DataViews package
+ * is bundled into this script (core does not expose it as a registered
+ * script handle); @wordpress/components, @wordpress/element, etc. are
+ * externalised and resolve to the WP core globals at runtime.
  *
  * Sections:
- *   1. Post Types — DataViews table with toggle, Gutenberg status badge,
- *      toolbar preset selector inline per row.
- *   2. Editor Options — component-based form.
- *   3. AI Features — status card: connected provider + CTA.
+ *   1. Post Types — DataViews table: search, sort, filter by editor,
+ *      single + bulk enable/disable actions.
+ *   2. Editor Options — toolbar preset.
+ *   3. AI Features — availability status card.
  */
 
-import { createElement, render, useState, useEffect } from '@wordpress/element';
+import apiFetch from '@wordpress/api-fetch';
+import {
+	Card,
+	CardBody,
+	CardHeader,
+	ExternalLink,
+	Notice,
+	SelectControl,
+	Spinner,
+} from '@wordpress/components';
+import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
+import type { Action, Field, View } from '@wordpress/dataviews';
+import { createRoot, useEffect, useMemo, useState } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 
-// @wordpress/components and @wordpress/dataviews are externalised —
-// they resolve to the WP 7.0 globals at runtime.
-// Type-only imports are safe here; the runtime objects come from WP core.
+import '@wordpress/dataviews/build-style/style.css';
 
-interface Settings {
+type ToolbarPreset = 'minimal' | 'standard' | 'full';
+
+interface AvailablePostType {
+	slug: string;
+	label: string;
+	uses_block_editor: boolean;
+}
+
+interface SettingsResponse {
 	post_types: string[];
-	toolbar_preset: 'minimal' | 'standard' | 'full';
+	toolbar_preset: ToolbarPreset;
 	has_ai_client: boolean;
 	has_abilities: boolean;
+	available_post_types: AvailablePostType[];
 }
 
-interface PostType {
-	name: string;
-	label: string;
-	usesBlockEditor: boolean;
+/**
+ * A row in the DataViews table: a public post type plus its TipTap state.
+ */
+interface PostTypeItem extends AvailablePostType {
+	enabled: boolean;
 }
 
-declare global {
-	interface Window {
-		tiptapSettingsData?: {
-			postTypes: PostType[];
-			restUrl: string;
-			nonce: string;
-		};
+type EditorKind = 'tiptap' | 'block' | 'classic';
+
+function editorKind( item: PostTypeItem ): EditorKind {
+	if ( item.uses_block_editor ) {
+		return 'block';
 	}
+	return item.enabled ? 'tiptap' : 'classic';
 }
 
-async function fetchSettings( restUrl: string, nonce: string ): Promise<Settings> {
-	const res = await fetch( restUrl + 'settings', {
-		headers: { 'X-WP-Nonce': nonce },
-	} );
-	return res.json() as Promise<Settings>;
-}
+const EDITOR_LABELS: Record< EditorKind, string > = {
+	tiptap: __( 'TipTap', 'tiptap-editor' ),
+	block: __( 'Block editor', 'tiptap-editor' ),
+	classic: __( 'Classic (TinyMCE)', 'tiptap-editor' ),
+};
 
-async function saveSettings(
-	data: Partial<Settings>,
-	restUrl: string,
-	nonce: string,
-): Promise<Settings> {
-	const res = await fetch( restUrl + 'settings', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			'X-WP-Nonce': nonce,
-		},
-		body: JSON.stringify( data ),
-	} );
-	return res.json() as Promise<Settings>;
-}
+const DEFAULT_VIEW: View = {
+	type: 'table',
+	page: 1,
+	perPage: 10,
+	search: '',
+	sort: { field: 'label', direction: 'asc' },
+	titleField: 'label',
+	fields: [ 'slug', 'editor' ],
+};
 
-function ModernSettingsApp() {
-	const { restUrl, nonce, postTypes } = window.tiptapSettingsData ?? {
-		restUrl: '/wp-json/tiptap-editor/v1/',
-		nonce: '',
-		postTypes: [],
-	};
-
-	const [ settings, setSettings ] = useState<Settings | null>( null );
-	const [ isSaving, setIsSaving ] = useState( false );
-	const [ saveStatus, setSaveStatus ] = useState<'idle' | 'saved' | 'error'>( 'idle' );
-
-	useEffect( () => {
-		fetchSettings( restUrl, nonce ).then( setSettings ).catch( console.error );
-	}, [ restUrl, nonce ] );
-
-	const updatePostType = async ( name: string, enabled: boolean ): Promise<void> => {
-		if ( ! settings ) return;
-		const newTypes = enabled
-			? [ ...settings.post_types, name ]
-			: settings.post_types.filter( ( t ) => t !== name );
-
-		setIsSaving( true );
-		try {
-			const updated = await saveSettings( { post_types: newTypes }, restUrl, nonce );
-			setSettings( ( prev ) => ( prev ? { ...prev, post_types: updated.post_types } : prev ) );
-			setSaveStatus( 'saved' );
-			setTimeout( () => setSaveStatus( 'idle' ), 2000 );
-		} catch {
-			setSaveStatus( 'error' );
-		} finally {
-			setIsSaving( false );
-		}
-	};
-
-	const updateToolbarPreset = async ( preset: Settings['toolbar_preset'] ): Promise<void> => {
-		if ( ! settings ) return;
-		setIsSaving( true );
-		try {
-			const updated = await saveSettings( { toolbar_preset: preset }, restUrl, nonce );
-			setSettings( ( prev ) =>
-				prev ? { ...prev, toolbar_preset: updated.toolbar_preset } : prev,
+const FIELDS: Field< PostTypeItem >[] = [
+	{
+		id: 'label',
+		label: __( 'Post type', 'tiptap-editor' ),
+		enableGlobalSearch: true,
+		enableSorting: true,
+		getValue: ( { item } ) => item.label,
+	},
+	{
+		id: 'slug',
+		label: __( 'Slug', 'tiptap-editor' ),
+		enableGlobalSearch: true,
+		enableSorting: true,
+		getValue: ( { item } ) => item.slug,
+		render: ( { item } ) => <code>{ item.slug }</code>,
+	},
+	{
+		id: 'editor',
+		label: __( 'Editor', 'tiptap-editor' ),
+		enableSorting: true,
+		getValue: ( { item } ) => editorKind( item ),
+		elements: ( Object.keys( EDITOR_LABELS ) as EditorKind[] ).map( ( value ) => ( {
+			value,
+			label: EDITOR_LABELS[ value ],
+		} ) ),
+		render: ( { item } ) => {
+			const kind = editorKind( item );
+			return (
+				<span className={ `tiptap-editor-badge tiptap-editor-badge--${ kind }` }>
+					{ EDITOR_LABELS[ kind ] }
+				</span>
 			);
-			setSaveStatus( 'saved' );
-			setTimeout( () => setSaveStatus( 'idle' ), 2000 );
-		} catch {
-			setSaveStatus( 'error' );
-		} finally {
-			setIsSaving( false );
-		}
-	};
+		},
+	},
+];
 
-	if ( ! settings ) {
-		return createElement( 'div', { className: 'tiptap-settings-loading' }, 'Loading…' );
-	}
+function PostTypesDataView( {
+	items,
+	onEnable,
+	onDisable,
+}: {
+	items: PostTypeItem[];
+	onEnable: ( slugs: string[] ) => void;
+	onDisable: ( slugs: string[] ) => void;
+} ) {
+	const [ view, setView ] = useState< View >( DEFAULT_VIEW );
 
-	return createElement(
-		'div',
-		{ className: 'tiptap-settings-modern' },
+	const actions = useMemo< Action< PostTypeItem >[] >(
+		() => [
+			{
+				id: 'enable-tiptap',
+				label: __( 'Enable TipTap', 'tiptap-editor' ),
+				isPrimary: true,
+				supportsBulk: true,
+				isEligible: ( item ) => ! item.uses_block_editor && ! item.enabled,
+				callback: ( selected ) => onEnable( selected.map( ( i ) => i.slug ) ),
+			},
+			{
+				id: 'disable-tiptap',
+				label: __( 'Disable TipTap', 'tiptap-editor' ),
+				supportsBulk: true,
+				isEligible: ( item ) => item.enabled,
+				callback: ( selected ) => onDisable( selected.map( ( i ) => i.slug ) ),
+			},
+		],
+		[ onEnable, onDisable ]
+	);
 
-		// Header.
-		createElement( 'h1', { className: 'tiptap-settings-modern__title' }, 'TipTap Editor' ),
+	const { data: shownItems, paginationInfo } = useMemo(
+		() => filterSortAndPaginate( items, view, FIELDS ),
+		[ items, view ]
+	);
 
-		// Save status notice.
-		saveStatus === 'saved' &&
-			createElement(
-				'div',
-				{ className: 'notice notice-success is-dismissible', role: 'status' },
-				createElement( 'p', null, 'Settings saved.' ),
-			),
-		saveStatus === 'error' &&
-			createElement(
-				'div',
-				{ className: 'notice notice-error', role: 'alert' },
-				createElement( 'p', null, 'Failed to save settings. Please try again.' ),
-			),
-
-		// Section: Post Types.
-		createElement(
-			'section',
-			{ className: 'tiptap-settings-modern__section' },
-			createElement( 'h2', null, 'Post Types' ),
-			createElement(
-				'p',
-				{ className: 'description' },
-				'Select which post types use TipTap Editor.',
-			),
-			createElement(
-				'table',
-				{ className: 'wp-list-table widefat fixed striped' },
-				createElement(
-					'thead',
-					null,
-					createElement(
-						'tr',
-						null,
-						createElement( 'th', null, 'Post Type' ),
-						createElement( 'th', null, 'TipTap Active' ),
-						createElement( 'th', null, 'Toolbar' ),
-						createElement( 'th', null, 'Status' ),
-					),
-				),
-				createElement(
-					'tbody',
-					null,
-					postTypes.map( ( pt ) => {
-						const isActive = settings.post_types.includes( pt.name );
-						return createElement(
-							'tr',
-							{ key: pt.name },
-							createElement( 'td', null, pt.label ),
-							createElement(
-								'td',
-								null,
-								createElement( 'input', {
-									type: 'checkbox',
-									checked: isActive,
-									disabled: pt.usesBlockEditor || isSaving,
-									onChange: ( e: Event ) =>
-										updatePostType(
-											pt.name,
-											( e.target as HTMLInputElement ).checked,
-										),
-									'aria-label': `Enable TipTap for ${ pt.label }`,
-								} ),
-							),
-							createElement(
-								'td',
-								null,
-								isActive
-									? createElement(
-											'select',
-											{
-												value: settings.toolbar_preset,
-												onChange: ( e: Event ) =>
-													updateToolbarPreset(
-														( e.target as HTMLSelectElement )
-															.value as Settings['toolbar_preset'],
-													),
-											},
-											createElement( 'option', { value: 'minimal' }, 'Minimal' ),
-											createElement( 'option', { value: 'standard' }, 'Standard' ),
-											createElement( 'option', { value: 'full' }, 'Full' ),
-									  )
-									: '—',
-							),
-							createElement(
-								'td',
-								null,
-								pt.usesBlockEditor
-									? createElement(
-											'span',
-											{ className: 'tiptap-badge tiptap-badge--block-editor' },
-											'Block editor',
-									  )
-									: isActive
-									? createElement(
-											'span',
-											{ className: 'tiptap-badge tiptap-badge--active' },
-											'Active',
-									  )
-									: null,
-							),
-						);
-					} ),
-				),
-			),
-		),
-
-		// Section: AI Features.
-		createElement(
-			'section',
-			{ className: 'tiptap-settings-modern__section' },
-			createElement( 'h2', null, 'AI Features' ),
-			settings.has_ai_client
-				? createElement(
-						'div',
-						{ className: 'tiptap-ai-status tiptap-ai-status--connected' },
-						createElement( 'p', null, 'AI writing features are available.' ),
-				  )
-				: createElement(
-						'div',
-						{ className: 'notice notice-info' },
-						createElement(
-							'p',
-							null,
-							'No AI provider connected. ',
-							createElement(
-								'a',
-								{ href: 'options-general.php?page=connectors' },
-								'Connect a provider in Settings → Connectors',
-							),
-							' to enable AI writing features.',
-						),
-				  ),
-		),
+	return (
+		<DataViews< PostTypeItem >
+			data={ shownItems }
+			fields={ FIELDS }
+			view={ view }
+			onChangeView={ setView }
+			actions={ actions }
+			paginationInfo={ paginationInfo }
+			getItemId={ ( item ) => item.slug }
+			defaultLayouts={ { table: {} } }
+		/>
 	);
 }
 
-const root = document.getElementById( 'tiptap-editor-settings-root' );
-if ( root ) {
-	render( createElement( ModernSettingsApp ), root );
+function SettingsApp() {
+	const [ settings, setSettings ] = useState< SettingsResponse | null >( null );
+	const [ error, setError ] = useState< string | null >( null );
+	const [ notice, setNotice ] = useState< string | null >( null );
+
+	useEffect( () => {
+		apiFetch< SettingsResponse >( { path: '/tiptap-editor/v1/settings' } )
+			.then( setSettings )
+			.catch( ( err: { message?: string } ) =>
+				setError( err.message ?? __( 'Failed to load settings.', 'tiptap-editor' ) )
+			);
+	}, [] );
+
+	const saveSettings = ( data: { post_types?: string[]; toolbar_preset?: ToolbarPreset } ) => {
+		setError( null );
+		apiFetch< Partial< SettingsResponse > >( {
+			path: '/tiptap-editor/v1/settings',
+			method: 'POST',
+			data,
+		} )
+			.then( ( updated ) => {
+				setSettings( ( prev ) => ( prev ? { ...prev, ...updated } : prev ) );
+				setNotice( __( 'Settings saved.', 'tiptap-editor' ) );
+			} )
+			.catch( ( err: { message?: string } ) =>
+				setError( err.message ?? __( 'Failed to save settings.', 'tiptap-editor' ) )
+			);
+	};
+
+	if ( error && ! settings ) {
+		return (
+			<Notice status="error" isDismissible={ false }>
+				{ error }
+			</Notice>
+		);
+	}
+
+	if ( ! settings ) {
+		return (
+			<div className="tiptap-settings-modern__loading">
+				<Spinner />
+				<span>{ __( 'Loading settings…', 'tiptap-editor' ) }</span>
+			</div>
+		);
+	}
+
+	const items: PostTypeItem[] = settings.available_post_types.map( ( pt ) => ( {
+		...pt,
+		enabled: settings.post_types.includes( pt.slug ),
+	} ) );
+
+	const enable = ( slugs: string[] ) =>
+		saveSettings( {
+			post_types: [ ...new Set( [ ...settings.post_types, ...slugs ] ) ],
+		} );
+
+	const disable = ( slugs: string[] ) =>
+		saveSettings( {
+			post_types: settings.post_types.filter( ( s ) => ! slugs.includes( s ) ),
+		} );
+
+	const enabledCount = items.filter( ( i ) => i.enabled ).length;
+
+	return (
+		<div className="tiptap-settings-modern">
+			{ notice && (
+				<Notice status="success" onRemove={ () => setNotice( null ) }>
+					{ notice }
+				</Notice>
+			) }
+			{ error && (
+				<Notice status="error" onRemove={ () => setError( null ) }>
+					{ error }
+				</Notice>
+			) }
+
+			<Card className="tiptap-settings-modern__section">
+				<CardHeader>
+					<h2>{ __( 'Post types', 'tiptap-editor' ) }</h2>
+					<span className="tiptap-settings-modern__count">
+						{ sprintf(
+							/* translators: %d: number of post types using TipTap. */
+							__( '%d using TipTap', 'tiptap-editor' ),
+							enabledCount
+						) }
+					</span>
+				</CardHeader>
+				<CardBody className="tiptap-settings-modern__dataviews">
+					<PostTypesDataView items={ items } onEnable={ enable } onDisable={ disable } />
+				</CardBody>
+			</Card>
+
+			<Card className="tiptap-settings-modern__section">
+				<CardHeader>
+					<h2>{ __( 'Editor options', 'tiptap-editor' ) }</h2>
+				</CardHeader>
+				<CardBody>
+					<SelectControl
+						label={ __( 'Toolbar', 'tiptap-editor' ) }
+						value={ settings.toolbar_preset }
+						options={ [
+							{
+								value: 'minimal',
+								label: __( 'Minimal (bold, italic, links only)', 'tiptap-editor' ),
+							},
+							{
+								value: 'standard',
+								label: __( 'Standard (recommended)', 'tiptap-editor' ),
+							},
+							{
+								value: 'full',
+								label: __( 'Full (all formatting options)', 'tiptap-editor' ),
+							},
+						] }
+						onChange={ ( value ) =>
+							saveSettings( { toolbar_preset: value as ToolbarPreset } )
+						}
+						__nextHasNoMarginBottom
+					/>
+				</CardBody>
+			</Card>
+
+			<Card className="tiptap-settings-modern__section">
+				<CardHeader>
+					<h2>{ __( 'AI features', 'tiptap-editor' ) }</h2>
+				</CardHeader>
+				<CardBody>
+					{ settings.has_ai_client ? (
+						<p>{ __( 'AI writing features are available.', 'tiptap-editor' ) }</p>
+					) : (
+						<Notice status="info" isDismissible={ false }>
+							{ __( 'No AI provider connected.', 'tiptap-editor' ) }{ ' ' }
+							<ExternalLink href="options-general.php?page=connectors">
+								{ __( 'Connect a provider in Settings → Connectors', 'tiptap-editor' ) }
+							</ExternalLink>
+						</Notice>
+					) }
+				</CardBody>
+			</Card>
+		</div>
+	);
+}
+
+const rootEl = document.getElementById( 'tiptap-editor-settings-root' );
+if ( rootEl ) {
+	createRoot( rootEl ).render( <SettingsApp /> );
 }
