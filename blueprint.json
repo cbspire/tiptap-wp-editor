@@ -18,21 +18,22 @@
 		{
 			"step": "installPlugin",
 			"pluginData": {
-				"resource": "url",
-				"url": "https://github-proxy.com/proxy/?repo=cbspire/tiptap-wp-editor&release=latest&asset=tiptap-editor.zip"
+				"resource": "wordpress.org/plugins",
+				"slug": "classic-editor"
 			},
 			"options": {
 				"activate": true
 			}
 		},
 		{
-			"step": "mkdir",
-			"path": "/wordpress/wp-content/mu-plugins"
-		},
-		{
-			"step": "writeFile",
-			"path": "/wordpress/wp-content/mu-plugins/tiptap-playground-demo.php",
-			"data": "<?php\n/**\n * Playground demo helper.\n *\n * TipTap Editor never overrides Gutenberg, so for the demo we opt the\n * 'post' post type out of the block editor. This makes the classic edit\n * screen load, where TipTap replaces TinyMCE.\n */\nadd_filter(\n\t'use_block_editor_for_post_type',\n\tstatic function ( $use_block_editor, $post_type ) {\n\t\treturn 'post' === $post_type ? false : $use_block_editor;\n\t},\n\t10,\n\t2\n);\n"
+			"step": "installPlugin",
+			"pluginData": {
+				"resource": "url",
+				"url": "https://github-proxy.com/proxy/?repo=cbspire/tiptap-wp-editor&release=latest&asset=tiptap-editor.zip"
+			},
+			"options": {
+				"activate": true
+			}
 		},
 		{
 			"step": "setSiteOptions",
