@@ -29,7 +29,7 @@
 			"step": "installPlugin",
 			"pluginData": {
 				"resource": "url",
-				"url": "https://github-proxy.com/proxy/?repo=cbspire/tiptap-wp-editor&release=latest&asset=tiptap-editor.zip"
+				"url": "https://github.com/cbspire/tiptap-wp-editor/releases/download/latest/tiptap-editor.zip"
 			},
 			"options": {
 				"activate": true
