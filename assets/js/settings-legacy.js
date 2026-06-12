@@ -1,1 +1,0 @@
-(()=>{"use strict";const e=window.wp.element,t=document.getElementById("tiptap-editor-settings-root");t&&(0,e.render)((0,e.createElement)(()=>(0,e.createElement)("div",{id:"tiptap-settings-legacy-root"},null)),t)})();

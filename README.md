@@ -90,7 +90,7 @@ vendor/bin/phpcs --standard=WordPress includes/   # PHP coding standards
 vendor/bin/phpunit                                # PHP unit tests
 ```
 
-Compiled bundles in `assets/` are committed (WordPress.org convention — the plugin must work without a build step), and are rebuilt by CI on every push to `main`.
+Built files are **not** committed — `assets/js/` and the generated `assets/css/style-*.css` are gitignored and produced by `npm run build`. Only the hand-authored stylesheets in `assets/css/` live in the repo. CI builds the bundles on every push to `main`, so the release zip (and the Playground demo) always contains compiled assets; installing straight from a git checkout requires running the build first.
 
 ### Releases
 
