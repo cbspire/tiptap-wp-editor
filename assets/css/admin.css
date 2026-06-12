@@ -11,36 +11,68 @@
    ========================================================================= */
 
 .tiptap-settings-modern {
-	max-width: 800px;
+	max-width: 960px;
 	padding: 12px 0;
 }
 
-.tiptap-settings-modern__title {
-	font-size: 23px;
-	font-weight: 400;
-	margin: 0 0 16px;
-}
-
+/* Cards come from @wordpress/components; only spacing and the header
+   layout are plugin-specific. Use design tokens with fallbacks. */
 .tiptap-settings-modern__section {
-	background: #fff;
-	border: 1px solid #c3c4c7;
-	border-radius: 4px;
-	padding: 20px 24px;
 	margin-bottom: 16px;
 }
 
 .tiptap-settings-modern__section h2 {
 	font-size: 14px;
 	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: 0.05em;
-	margin: 0 0 12px;
-	color: #646970;
+	margin: 0;
+	color: var(--wp-components-color-foreground, #1e1e1e);
 }
 
-.tiptap-settings-loading {
-	color: #646970;
+.tiptap-settings-modern__count {
+	color: var(--wp-components-color-gray-700, #646970);
+	font-size: 12px;
+}
+
+/* Let the DataViews table span the card edge-to-edge. */
+.tiptap-settings-modern__dataviews {
+	padding: 0;
+}
+
+.tiptap-settings-modern__loading {
+	align-items: center;
+	color: var(--wp-components-color-gray-700, #646970);
+	display: flex;
+	gap: 8px;
 	padding: 24px 0;
+}
+
+/* =========================================================================
+   Editor badges (DataViews "Editor" column)
+   ========================================================================= */
+
+.tiptap-editor-badge {
+	border-radius: 10px;
+	display: inline-block;
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	padding: 2px 8px;
+	text-transform: uppercase;
+}
+
+.tiptap-editor-badge--tiptap {
+	background: #d4edda;
+	color: #155724;
+}
+
+.tiptap-editor-badge--block {
+	background: #e2e3e5;
+	color: #383d41;
+}
+
+.tiptap-editor-badge--classic {
+	background: #fff3cd;
+	color: #856404;
 }
 
 /* =========================================================================

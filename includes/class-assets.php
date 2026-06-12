@@ -45,11 +45,16 @@ class Tiptap_Editor_Assets {
 			return;
 		}
 
+		$asset = $this->asset_meta(
+			'assets/js/editor.asset.php',
+			[ 'wp-element', 'wp-i18n', 'wp-hooks' ]
+		);
+
 		wp_enqueue_script(
 			'tiptap-editor',
 			TIPTAP_EDITOR_URL . 'assets/js/editor.js',
-			[ 'wp-element', 'wp-i18n', 'wp-hooks' ],
-			$this->asset_version( 'assets/js/editor.js' ),
+			$asset['dependencies'],
+			$asset['version'],
 			true
 		);
 
@@ -130,11 +135,16 @@ class Tiptap_Editor_Assets {
 	 * Enqueue the legacy (WP 6.8/6.9) settings page JS.
 	 */
 	private function enqueue_legacy_settings(): void {
+		$asset = $this->asset_meta(
+			'assets/js/settings-legacy.asset.php',
+			[ 'wp-element', 'wp-i18n' ]
+		);
+
 		wp_enqueue_script(
 			'tiptap-editor-settings-legacy',
 			TIPTAP_EDITOR_URL . 'assets/js/settings-legacy.js',
-			[ 'wp-element', 'wp-i18n' ],
-			$this->asset_version( 'assets/js/settings-legacy.js' ),
+			$asset['dependencies'],
+			$asset['version'],
 			true
 		);
 
@@ -142,18 +152,68 @@ class Tiptap_Editor_Assets {
 	}
 
 	/**
-	 * Enqueue the modern (WP 7.0+) settings page JS.
+	 * Enqueue the modern (WP 7.0+) settings page JS and styles.
+	 *
+	 * @wordpress/dataviews is bundled into the script (it is not a core
+	 * script handle); its stylesheet is emitted to css/settings-modern.css
+	 * at build time. All other @wordpress/* packages are externalised and
+	 * listed in the generated .asset.php file.
 	 */
 	private function enqueue_modern_settings(): void {
+		$asset = $this->asset_meta(
+			'assets/js/settings-modern.asset.php',
+			[ 'wp-api-fetch', 'wp-components', 'wp-element', 'wp-i18n' ]
+		);
+
 		wp_enqueue_script(
 			'tiptap-editor-settings-modern',
 			TIPTAP_EDITOR_URL . 'assets/js/settings-modern.js',
-			[ 'wp-dataviews', 'wp-components', 'wp-element', 'wp-i18n' ],
-			$this->asset_version( 'assets/js/settings-modern.js' ),
+			$asset['dependencies'],
+			$asset['version'],
 			true
 		);
 
 		wp_set_script_translations( 'tiptap-editor-settings-modern', 'tiptap-editor', TIPTAP_EDITOR_DIR . 'languages' );
+
+		// DataViews/Cards rely on the wp-components stylesheet.
+		wp_enqueue_style( 'wp-components' );
+
+		wp_enqueue_style(
+			'tiptap-editor-settings-modern',
+			TIPTAP_EDITOR_URL . 'assets/css/style-settings-modern.css',
+			[ 'wp-components' ],
+			$this->asset_version( 'assets/css/style-settings-modern.css' )
+		);
+		wp_style_add_data( 'tiptap-editor-settings-modern', 'rtl', 'replace' );
+	}
+
+	/**
+	 * Read a generated .asset.php file (dependencies + version).
+	 *
+	 * Falls back to the given dependencies and the plugin version when the
+	 * file is missing (e.g. assets built by an older toolchain).
+	 *
+	 * @param  string   $relative_path Asset file path relative to the plugin root.
+	 * @param  string[] $fallback_deps Dependencies to use if the file is missing.
+	 * @return array{dependencies: string[], version: string}
+	 */
+	private function asset_meta( string $relative_path, array $fallback_deps ): array {
+		$path = TIPTAP_EDITOR_DIR . $relative_path;
+
+		if ( file_exists( $path ) ) {
+			$asset = require $path;
+			if ( is_array( $asset ) && isset( $asset['dependencies'], $asset['version'] ) ) {
+				return [
+					'dependencies' => (array) $asset['dependencies'],
+					'version'      => (string) $asset['version'],
+				];
+			}
+		}
+
+		return [
+			'dependencies' => $fallback_deps,
+			'version'      => TIPTAP_EDITOR_VERSION,
+		];
 	}
 
 	/**

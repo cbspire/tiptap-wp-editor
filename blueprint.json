@@ -7,13 +7,13 @@
 	},
 	"preferredVersions": {
 		"php": "8.2",
-		"wp": "latest"
+		"wp": "7.0"
 	},
 	"features": {
 		"networking": true
 	},
 	"login": true,
-	"landingPage": "/wp-admin/post-new.php",
+	"landingPage": "/wp-admin/options-general.php?page=tiptap-editor",
 	"steps": [
 		{
 			"step": "installPlugin",

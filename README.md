@@ -7,7 +7,7 @@ A modern, focused rich text editor for WordPress built on [TipTap](https://tipta
 
 ## 🚀 Try it now
 
-**[Launch the demo in WordPress Playground](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/cbspire/tiptap-wp-editor/main/blueprint.json)** — no install required. It spins up a throwaway WordPress site in your browser with the latest `main` build of the plugin installed, activated, and enabled for posts. You land directly on the post editor.
+**[Launch the demo in WordPress Playground](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/cbspire/tiptap-wp-editor/main/blueprint.json)** — no install required. It spins up a throwaway **WordPress 7.0** site in your browser with the latest `main` build of the plugin installed, activated, and enabled for posts. You land on the plugin's DataViews settings page; open any post to see the editor itself.
 
 The demo installs the `tiptap-editor.zip` asset from the rolling [`latest` release](https://github.com/cbspire/tiptap-wp-editor/releases/tag/latest), which is rebuilt automatically on every push to `main`.
 
@@ -108,7 +108,7 @@ The full specification lives in [`PLAN.md`](PLAN.md); AI-assistant context and c
 
 - **`includes/class-version-compat.php`** — every WP version check routes through this single class.
 - **`includes/class-content-converter.php`** — safety-critical HTML ↔ TipTap pipeline. Shortcodes are tokenised before TipTap sees the HTML and restored verbatim on save; round-trip fidelity is validated on every save and never blocks saving.
-- **Two-tier admin UI/CSS** — WP 6.8/6.9 get a Settings-API page and self-contained CSS; WP 7.0+ gets a DataViews page and design-token CSS. The router (`class-admin-ui.php`) hides the difference from the rest of the plugin.
+- **Two-tier admin UI/CSS** — WP 6.8/6.9 get a Settings-API page and self-contained CSS; WP 7.0+ gets a React settings page built on [`@wordpress/dataviews`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-dataviews/) (bundled into `settings-modern.js` — it is not a core script handle) and design-token CSS. The router (`class-admin-ui.php`) hides the difference from the rest of the plugin.
 
 ## License
 

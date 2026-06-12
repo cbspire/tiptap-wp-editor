@@ -80,13 +80,39 @@ class Tiptap_Editor_Admin_UI_Modern {
 	public function rest_get_settings(): WP_REST_Response {
 		return new WP_REST_Response(
 			[
-				'post_types'      => (array) get_option( 'tiptap_editor_post_types', [] ),
-				'toolbar_preset'  => (string) get_option( 'tiptap_editor_toolbar_preset', 'standard' ),
-				'has_ai_client'   => Tiptap_Editor_Version_Compat::has_ai_client(),
-				'has_abilities'   => Tiptap_Editor_Version_Compat::has_abilities_api(),
+				'post_types'           => (array) get_option( 'tiptap_editor_post_types', [] ),
+				'toolbar_preset'       => (string) get_option( 'tiptap_editor_toolbar_preset', 'standard' ),
+				'has_ai_client'        => Tiptap_Editor_Version_Compat::has_ai_client(),
+				'has_abilities'        => Tiptap_Editor_Version_Compat::has_abilities_api(),
+				'available_post_types' => $this->get_available_post_types(),
 			],
 			200
 		);
+	}
+
+	/**
+	 * All public post types with the data the settings UI needs.
+	 *
+	 * @return array<int, array{slug: string, label: string, uses_block_editor: bool}>
+	 */
+	private function get_available_post_types(): array {
+		// use_block_editor_for_post_type() is admin-only; REST requests
+		// don't load wp-admin includes.
+		if ( ! function_exists( 'use_block_editor_for_post_type' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/post.php';
+		}
+
+		$post_types = [];
+
+		foreach ( get_post_types( [ 'public' => true ], 'objects' ) as $post_type ) {
+			$post_types[] = [
+				'slug'              => $post_type->name,
+				'label'             => $post_type->label,
+				'uses_block_editor' => use_block_editor_for_post_type( $post_type->name ),
+			];
+		}
+
+		return $post_types;
 	}
 
 	/**
