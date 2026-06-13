@@ -154,6 +154,45 @@ export function getSlashMenuItems(): SlashMenuItem[] {
 					.run(),
 		},
 		{
+			title: '2 columns',
+			hint: 'Two-column responsive layout',
+			icon: '▥',
+			keywords: [ 'columns', 'layout', 'grid', 'two', '2col' ],
+			command: ( { editor, range } ) =>
+				editor
+					.chain()
+					.focus()
+					.deleteRange( range )
+					.insertColumns( 2 )
+					.run(),
+		},
+		{
+			title: '3 columns',
+			hint: 'Three-column responsive layout',
+			icon: '▦',
+			keywords: [ 'columns', 'layout', 'grid', 'three', '3col' ],
+			command: ( { editor, range } ) =>
+				editor
+					.chain()
+					.focus()
+					.deleteRange( range )
+					.insertColumns( 3 )
+					.run(),
+		},
+		{
+			title: 'Button',
+			hint: 'Call-to-action link button',
+			icon: '⏵',
+			keywords: [ 'button', 'cta', 'link', 'action' ],
+			command: ( { editor, range } ) =>
+				editor
+					.chain()
+					.focus()
+					.deleteRange( range )
+					.insertWPButton()
+					.run(),
+		},
+		{
 			title: 'Image',
 			hint: 'Insert from the Media Library',
 			icon: '🖼',

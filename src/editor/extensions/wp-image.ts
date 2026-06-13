@@ -49,6 +49,16 @@ declare module '@tiptap/core' {
 export const WPImage = Image.extend( {
 	name: 'wpImage',
 
+	addOptions() {
+		return {
+			...this.parent?.(),
+			// Accept data: URIs so pasted/embedded base64 images survive
+			// (the base extension drops them by default). Media Library
+			// images remain plain http(s) URLs.
+			allowBase64: true,
+		};
+	},
+
 	addAttributes() {
 		return {
 			...this.parent?.(),
@@ -75,11 +85,24 @@ export const WPImage = Image.extend( {
 				parseHTML: () => null,
 				renderHTML: () => ( {} ),
 			},
-			// Standard WP image class (e.g. wp-image-42, alignleft, size-large)
+			// Extra classes carried verbatim (e.g. wp-image-42, size-large).
+			// The plugin's own tt-image* and WP align* classes live in their
+			// own attributes below and are stripped here to avoid duplication.
 			class: {
 				default: null,
-				parseHTML: ( element ) =>
-					element.getAttribute( 'class' ) ?? null,
+				parseHTML: ( element ) => {
+					const cls = ( element.getAttribute( 'class' ) ?? '' )
+						.split( /\s+/ )
+						.filter(
+							( c ) =>
+								c &&
+								c !== 'tt-image' &&
+								! /^tt-image--/.test( c ) &&
+								! /^align(left|center|right|none)$/.test( c )
+						)
+						.join( ' ' );
+					return cls || null;
+				},
 				renderHTML: ( attributes ) => {
 					if ( ! attributes.class ) {
 						return {};
@@ -87,13 +110,66 @@ export const WPImage = Image.extend( {
 					return { class: attributes.class as string };
 				},
 			},
+			// WP-native alignment class (alignleft/aligncenter/alignright) —
+			// themes style these out of the box.
+			align: {
+				default: null,
+				parseHTML: ( element ) => {
+					const match = ( element.getAttribute( 'class' ) ?? '' ).match(
+						/\balign(left|center|right)\b/
+					);
+					return match ? match[ 1 ] : null;
+				},
+				renderHTML: ( attributes ) => {
+					if ( ! attributes.align ) {
+						return {};
+					}
+					return { class: `align${ attributes.align as string }` };
+				},
+			},
+			// Width as a percentage of the content column, rendered as a
+			// tt-image--w{25|50|75|100} modifier class (styled in frontend.css).
+			widthPct: {
+				default: null,
+				parseHTML: ( element ) => {
+					const match = ( element.getAttribute( 'class' ) ?? '' ).match(
+						/\btt-image--w(\d+)\b/
+					);
+					return match ? parseInt( match[ 1 ], 10 ) : null;
+				},
+				renderHTML: ( attributes ) => {
+					if ( ! attributes.widthPct ) {
+						return {};
+					}
+					return { class: `tt-image--w${ attributes.widthPct as number }` };
+				},
+			},
+			// Rounded corners (styled via plugin CSS in editor + front end).
+			rounded: {
+				default: false,
+				parseHTML: ( element ) =>
+					( element.getAttribute( 'class' ) ?? '' )
+						.split( /\s+/ )
+						.includes( 'tt-image--rounded' ),
+				renderHTML: ( attributes ) => {
+					if ( ! attributes.rounded ) {
+						return {};
+					}
+					return { class: 'tt-image--rounded' };
+				},
+			},
 		};
 	},
 
 	renderHTML( { HTMLAttributes } ) {
+		// `tt-image` is the base class on every image; per-attribute
+		// renderHTML adds tt-image--* / align* / wp-image-* fragments,
+		// which mergeAttributes concatenates into one class list.
 		return [
 			'img',
-			mergeAttributes( this.options.HTMLAttributes, HTMLAttributes ),
+			mergeAttributes( this.options.HTMLAttributes, HTMLAttributes, {
+				class: 'tt-image',
+			} ),
 		];
 	},
 
@@ -125,7 +201,7 @@ export const WPImage = Image.extend( {
  * selected attachment data.
  * @param onSelect
  */
-function openMediaLibrary(
+export function openMediaLibrary(
 	onSelect: ( data: {
 		id: number;
 		url: string;
