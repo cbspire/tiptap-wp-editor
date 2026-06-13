@@ -1,0 +1,146 @@
+/**
+ * TipTap Editor — Front-end Styles
+ *
+ * Styles for the plugin-specific markup saved in post_content:
+ * responsive column layouts (.tt-columns / .tt-column), call-to-action
+ * buttons (.tt-button) and images (.tt-image). Enqueued on singular
+ * views of TipTap-enabled post types only.
+ *
+ * Everything lives in the `base` cascade layer, so an unlayered theme
+ * rule of equal specificity always wins — themes can restyle the markup
+ * without specificity battles. The visual values are driven by `--tt-*`
+ * custom properties, so most theming needs only a variable override.
+ *
+ * Image alignment uses the WP-native classes (alignleft/aligncenter/
+ * alignright), which themes are expected to style; gentle fallbacks are
+ * included for themes that don't.
+ */
+
+@layer base {
+	:root {
+		--tt-columns-gap: 24px;
+		--tt-columns-breakpoint: 600px;
+		--tt-button-padding: 10px 24px;
+		--tt-button-radius: 4px;
+		--tt-button-weight: 600;
+		--tt-button-bg: #2271b1;
+		--tt-button-bg-hover: #135e96;
+		--tt-button-fg: #fff;
+		--tt-image-radius: 12px;
+	}
+
+	/* =====================================================================
+	   Columns — responsive grid, collapses on small screens
+	   ===================================================================== */
+
+	.tt-columns {
+		display: grid;
+		gap: var(--tt-columns-gap);
+		margin-bottom: 1.5em;
+	}
+
+	.tt-columns--2 {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.tt-columns--3 {
+		grid-template-columns: repeat(3, 1fr);
+	}
+
+	.tt-column {
+		min-width: 0;
+	}
+
+	@media (max-width: 600px) {
+		.tt-columns--2,
+		.tt-columns--3 {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	/* =====================================================================
+	   Button block
+	   ===================================================================== */
+
+	.tt-button-wrap {
+		margin: 0 0 1.5em;
+	}
+
+	.tt-button {
+		display: inline-block;
+		padding: var(--tt-button-padding);
+		border-radius: var(--tt-button-radius);
+		font-weight: var(--tt-button-weight);
+		text-decoration: none;
+		transition: background 0.15s ease, color 0.15s ease;
+	}
+
+	.tt-button--fill {
+		background: var(--tt-button-bg);
+		border: 2px solid var(--tt-button-bg);
+		color: var(--tt-button-fg);
+	}
+
+	.tt-button--fill:hover {
+		background: var(--tt-button-bg-hover);
+		border-color: var(--tt-button-bg-hover);
+		color: var(--tt-button-fg);
+	}
+
+	.tt-button--outline {
+		background: transparent;
+		border: 2px solid var(--tt-button-bg);
+		color: var(--tt-button-bg);
+	}
+
+	.tt-button--outline:hover {
+		background: var(--tt-button-bg);
+		color: var(--tt-button-fg);
+	}
+
+	/* =====================================================================
+	   Images
+	   ===================================================================== */
+
+	.tt-image {
+		max-width: 100%;
+		height: auto;
+	}
+
+	.tt-image--rounded {
+		border-radius: var(--tt-image-radius);
+	}
+
+	.tt-image--w25 {
+		width: 25%;
+	}
+
+	.tt-image--w50 {
+		width: 50%;
+	}
+
+	.tt-image--w75 {
+		width: 75%;
+	}
+
+	.tt-image--w100 {
+		width: 100%;
+	}
+
+	/* WP-native alignment — fallbacks for themes without classic styles. */
+	.tt-image.alignleft {
+		float: left;
+		margin: 0.5em 1.5em 0.5em 0;
+	}
+
+	.tt-image.alignright {
+		float: right;
+		margin: 0.5em 0 0.5em 1.5em;
+	}
+
+	.tt-image.aligncenter {
+		display: block;
+		margin-left: auto;
+		margin-right: auto;
+	}
+}

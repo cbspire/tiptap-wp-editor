@@ -45,6 +45,173 @@
 }
 
 /* =========================================================================
+   Images
+   ========================================================================= */
+
+.ProseMirror img {
+	max-width: 100%;
+	height: auto;
+}
+
+.ProseMirror img.ProseMirror-selectednode {
+	outline: 2px solid currentColor;
+	outline-offset: 2px;
+}
+
+.ProseMirror img.alignleft {
+	float: left;
+	margin: 0.5em 1em 0.5em 0;
+}
+
+.ProseMirror img.alignright {
+	float: right;
+	margin: 0.5em 0 0.5em 1em;
+}
+
+.ProseMirror img.aligncenter {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.ProseMirror img.tt-image--rounded {
+	border-radius: 12px;
+}
+
+.ProseMirror img.tt-image--w25 {
+	width: 25%;
+}
+
+.ProseMirror img.tt-image--w50 {
+	width: 50%;
+}
+
+.ProseMirror img.tt-image--w75 {
+	width: 75%;
+}
+
+.ProseMirror img.tt-image--w100 {
+	width: 100%;
+}
+
+/* =========================================================================
+   Image options menu (shown when an image is selected)
+   ========================================================================= */
+
+.tiptap-image-menu {
+	position: fixed;
+	z-index: 100000;
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	padding: 4px;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 6px;
+	box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.tiptap-image-menu__button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 28px;
+	height: 28px;
+	padding: 0 6px;
+	border: 1px solid transparent;
+	border-radius: 4px;
+	background: transparent;
+	cursor: pointer;
+	font-size: 12px;
+	line-height: 1;
+}
+
+/* =========================================================================
+   Columns layout (content classes — mirror frontend.css)
+   ========================================================================= */
+
+.ProseMirror .tt-columns {
+	display: grid;
+	gap: 16px;
+	margin-bottom: 1em;
+}
+
+.ProseMirror .tt-columns--2 {
+	grid-template-columns: repeat(2, 1fr);
+}
+
+.ProseMirror .tt-columns--3 {
+	grid-template-columns: repeat(3, 1fr);
+}
+
+.ProseMirror .tt-column {
+	min-width: 0;
+	padding: 8px;
+	border: 1px dashed transparent;
+	border-radius: 4px;
+}
+
+.ProseMirror .tt-columns:hover > .tt-column {
+	border-color: currentColor;
+}
+
+/* =========================================================================
+   Button block (content classes — mirror frontend.css)
+   ========================================================================= */
+
+.tt-button-wrap {
+	margin: 0 0 1em;
+}
+
+.tt-button {
+	display: inline-block;
+	padding: 8px 20px;
+	border-radius: 4px;
+	font-weight: 600;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.tt-button--fill {
+	background: #2271b1;
+	border: 2px solid #2271b1;
+	color: #fff;
+}
+
+.tt-button--outline {
+	background: transparent;
+	border: 2px solid #2271b1;
+	color: #2271b1;
+}
+
+.ProseMirror .tt-button-wrap.ProseMirror-selectednode .tt-button {
+	outline: 2px solid currentColor;
+	outline-offset: 2px;
+}
+
+.tiptap-button-popover {
+	display: flex;
+	gap: 6px;
+	align-items: center;
+	padding: 8px;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.tiptap-button-popover__input {
+	padding: 4px 8px;
+	border: 1px solid #8c8f94;
+	border-radius: 2px;
+	font-size: 13px;
+}
+
+.tiptap-button-popover__select {
+	font-size: 13px;
+}
+
+/* =========================================================================
    Uploading image placeholder
    ========================================================================= */
 

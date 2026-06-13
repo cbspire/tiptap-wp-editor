@@ -13,7 +13,6 @@
 
 import { Editor } from '@tiptap/core';
 import { StarterKit } from '@tiptap/starter-kit';
-import { Image } from '@tiptap/extension-image';
 import { Link } from '@tiptap/extension-link';
 import { Underline } from '@tiptap/extension-underline';
 import { Placeholder } from '@tiptap/extension-placeholder';
@@ -23,8 +22,11 @@ import { WPReadMore } from './extensions/read-more';
 import { WPRawHTML } from './extensions/raw-html';
 import { WPImage } from './extensions/wp-image';
 import { WPImageUpload } from './extensions/image-upload';
+import { WPImageMenu } from './extensions/image-menu';
 import { WPDragHandle } from './extensions/drag-handle';
 import { SlashCommand } from './extensions/slash-command';
+import { WPColumns, WPColumn } from './extensions/columns';
+import { WPButton } from './extensions/button';
 
 /**
  * Data injected by PHP via wp_localize_script.
@@ -74,10 +76,7 @@ function bootEditor(): void {
 
 	// Build extension list.
 	const extensions = [
-		StarterKit.configure( {
-			// Disable extensions we replace with WP-specific variants.
-			image: false,
-		} ),
+		StarterKit,
 		Underline,
 		Link.configure( {
 			openOnClick: false,
@@ -85,7 +84,9 @@ function bootEditor(): void {
 				rel: 'noopener noreferrer',
 			},
 		} ),
-		Image,
+		// WPImage (extends @tiptap/extension-image) is the only image node —
+		// the base Image is intentionally not registered so saved <img> markup
+		// always parses into wpImage with its WordPress attributes.
 		Placeholder.configure( {
 			placeholder: ( { node } ) =>
 				node.type.name === 'heading'
@@ -97,6 +98,10 @@ function bootEditor(): void {
 		WPRawHTML,
 		WPImage,
 		WPImageUpload,
+		WPImageMenu,
+		WPColumns,
+		WPColumn,
+		WPButton,
 		WPDragHandle,
 		SlashCommand,
 	];
@@ -115,6 +120,9 @@ function bootEditor(): void {
 
 	// Set initial textarea value.
 	contentTextarea.value = editor.getHTML();
+
+	// Expose the editor instance for integrations and end-to-end tests.
+	( window as Window & { tiptapEditor?: Editor } ).tiptapEditor = editor;
 
 	// Mount the slim toolbar above the editor.
 	const toolbarRow = mountToolbar( editor, mountEl );

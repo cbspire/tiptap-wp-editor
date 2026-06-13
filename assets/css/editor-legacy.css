@@ -119,6 +119,27 @@
 }
 
 /* =========================================================================
+   Image options menu
+   ========================================================================= */
+
+.tiptap-image-menu {
+	background: #fff;
+	border-color: var(--tiptap-border);
+	color: var(--tiptap-text);
+}
+
+.tiptap-image-menu__button {
+	color: var(--tiptap-text);
+}
+
+.tiptap-image-menu__button:hover,
+.tiptap-image-menu__button.is-active {
+	background: var(--tiptap-active-bg);
+	border-color: var(--tiptap-active-border);
+	color: var(--tiptap-primary);
+}
+
+/* =========================================================================
    Drag handle
    ========================================================================= */
 

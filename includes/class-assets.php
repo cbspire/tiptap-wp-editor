@@ -24,6 +24,30 @@ class Tiptap_Editor_Assets {
 	public function register(): void {
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_editor_assets' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_settings_assets' ] );
+		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_frontend_assets' ] );
+	}
+
+	/**
+	 * Enqueue front-end styles for plugin markup saved in post_content
+	 * (column layouts, button blocks, rounded images) on singular views
+	 * of TipTap-enabled post types.
+	 */
+	public function enqueue_frontend_assets(): void {
+		if ( ! is_singular() ) {
+			return;
+		}
+
+		$post_type = get_post_type();
+		if ( ! $post_type || ! tiptap_editor_is_active_post_type( $post_type ) ) {
+			return;
+		}
+
+		wp_enqueue_style(
+			'tiptap-editor-frontend',
+			TIPTAP_EDITOR_URL . 'assets/css/frontend.css',
+			[],
+			$this->asset_version( 'assets/css/frontend.css' )
+		);
 	}
 
 	/**
@@ -64,19 +88,24 @@ class Tiptap_Editor_Assets {
 		wp_set_script_translations( 'tiptap-editor', 'tiptap-editor', TIPTAP_EDITOR_DIR . 'languages' );
 
 		// Inject feature flags and editor data.
-		wp_localize_script(
+		// wp_add_inline_script + wp_json_encode (not wp_localize_script,
+		// which casts booleans/ints to strings and breaks the strict
+		// `=== true` feature-flag checks in JS).
+		wp_add_inline_script(
 			'tiptap-editor',
-			'tiptapEditorData',
-			[
-				'hasAbilitiesApi' => Tiptap_Editor_Version_Compat::has_abilities_api(),
-				'hasAiClient'     => Tiptap_Editor_Version_Compat::has_ai_client(),
-				'restUrl'         => rest_url( 'tiptap-editor/v1/' ),
-				'mediaRestUrl'    => rest_url( 'wp/v2/media' ),
-				'canUploadFiles'  => current_user_can( 'upload_files' ),
-				'nonce'           => wp_create_nonce( 'wp_rest' ),
-				'postId'          => $post->ID,
-				'postType'        => $post->post_type,
-			]
+			'window.tiptapEditorData = ' . wp_json_encode(
+				[
+					'hasAbilitiesApi' => Tiptap_Editor_Version_Compat::has_abilities_api(),
+					'hasAiClient'     => Tiptap_Editor_Version_Compat::has_ai_client(),
+					'restUrl'         => rest_url( 'tiptap-editor/v1/' ),
+					'mediaRestUrl'    => rest_url( 'wp/v2/media' ),
+					'canUploadFiles'  => current_user_can( 'upload_files' ),
+					'nonce'           => wp_create_nonce( 'wp_rest' ),
+					'postId'          => $post->ID,
+					'postType'        => $post->post_type,
+				]
+			) . ';',
+			'before'
 		);
 
 		$this->enqueue_editor_css();

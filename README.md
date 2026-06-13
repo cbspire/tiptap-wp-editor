@@ -15,7 +15,7 @@ The demo installs the `tiptap-editor.zip` asset from the rolling [`latest` relea
 
 ![Editor overview: slim toolbar, placeholder text and block drag handle](docs/screenshots/editor-overview.png)
 
-- **Slash commands** — type `/` on any line to open a filterable block palette: headings, lists, quotes, code blocks, dividers, images, read-more, shortcodes and raw HTML. Navigate with `↑` `↓` `Enter`.
+- **Slash commands** — type `/` on any line to open a filterable block palette: headings, lists, quotes, code blocks, dividers, images, 2/3-column layouts, buttons, read-more, shortcodes and raw HTML. Navigate with `↑` `↓` `Enter`.
 
   ![Slash command menu](docs/screenshots/slash-menu.png)
 
@@ -28,8 +28,43 @@ The demo installs the `tiptap-editor.zip` asset from the rolling [`latest` relea
   ![Bubble menu on text selection](docs/screenshots/bubble-menu.png)
 
 - **Image uploads** — drag & drop or paste images straight into the editor; they upload to the Media Library via the REST API (with an animated placeholder while uploading, and a graceful error notice on failure). The Media Library picker is still one `/image` away.
+- **Image options** — select an image for a floating toolbar: align left/centre/right, set width (25/50/75/100%), round the corners, edit alt text, or replace/remove it.
+- **Responsive columns & buttons** — `/2 columns`, `/3 columns` and `/button` insert layout blocks. Columns are a CSS grid that collapses to a single column on mobile; buttons come in filled and outline styles.
+
+  ![Two-column layout with a rounded image and a call-to-action button](docs/screenshots/wp-columns-button.png)
+
 - **Block drag handles** — hover any block for the Notion-style ⠿ grip: drag to reorder, or hit `+` to add a block below. Pointer devices only; on touch the slim toolbar has you covered.
 - **Placeholder hints** — empty lines show *"Type "/" for commands…"* so the features stay discoverable.
+
+## Styling the rendered output
+
+Columns, buttons and images are saved to `post_content` as plain HTML with a minimal, predictable `tt-` class system, so themes can style or restyle them with no specificity battles:
+
+```html
+<div class="tt-columns tt-columns--2">
+  <div class="tt-column">…</div>
+  <div class="tt-column">…</div>
+</div>
+
+<div class="tt-button-wrap">
+  <a class="tt-button tt-button--fill" href="…">Get started</a>
+</div>
+
+<img class="tt-image tt-image--rounded tt-image--w50 aligncenter wp-image-42" …>
+```
+
+The front-end stylesheet (`assets/css/frontend.css`, loaded only on singular views of TipTap-enabled post types) lives entirely in a CSS `@layer base`, so any unlayered theme rule of equal specificity wins. Most visual tweaks need only a custom-property override — no `!important`:
+
+```css
+:root {
+  --tt-columns-gap: 32px;
+  --tt-button-bg: #d63638;
+  --tt-button-radius: 999px;
+  --tt-image-radius: 4px;
+}
+```
+
+Image alignment keeps the WordPress-native `alignleft`/`aligncenter`/`alignright` and `wp-image-{id}` classes, so existing theme styles apply unchanged.
 
 ## Features
 
